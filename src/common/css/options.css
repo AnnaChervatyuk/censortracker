@@ -247,3 +247,16 @@ a {
 .checkbox__group {
   margin-bottom: 25px;
 }
+
+.link-ignored {
+  margin-top: 0;
+  margin-bottom: 7px;
+}
+
+.main-page__link svg {
+  fill: #3b332b;
+}
+
+.main-page__link:hover svg {
+  fill: #625c55;
+}

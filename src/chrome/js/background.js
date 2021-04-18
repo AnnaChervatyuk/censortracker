@@ -6,11 +6,11 @@ import {
   extractHostnameFromUrl,
   getRequestFilter,
   ignore,
+  isValidURL,
   proxy,
   registry,
   settings,
   storage,
-  validateUrl,
 } from './core'
 
 window.censortracker = {
@@ -57,7 +57,14 @@ chrome.webRequest.onBeforeRequest.addListener(
  */
 const handleErrorOccurred = async ({ url, error, tabId }) => {
   const hostname = extractHostnameFromUrl(url)
-  const { proxyError, connectionError } = errors.determineError(error)
+  const encodedUrl = window.btoa(url)
+
+  const { proxyError, connectionError, interruptedError } = errors.determineError(error)
+
+  if (interruptedError) {
+    console.log(`Request interrupted for: ${hostname}`)
+    return
+  }
 
   if (ignore.contains(hostname)) {
     return
@@ -65,27 +72,27 @@ const handleErrorOccurred = async ({ url, error, tabId }) => {
 
   if (proxyError) {
     chrome.tabs.update(tabId, {
-      url: chrome.runtime.getURL('proxy_unavailable.html'),
+      url: chrome.runtime.getURL(`proxy_unavailable.html?originUrl=${encodedUrl}`),
     })
     return
   }
 
   if (connectionError) {
+    await registry.add(hostname)
     const isProxyControlledByOtherExtensions = await proxy.controlledByOtherExtensions()
     const isProxyControlledByThisExtension = await proxy.controlledByThisExtension()
 
     if (!isProxyControlledByOtherExtensions && !isProxyControlledByThisExtension) {
       chrome.tabs.update(tabId, {
-        url: chrome.runtime.getURL(`proxy_disabled.html?${window.btoa(url)}`),
+        url: chrome.runtime.getURL(`proxy_disabled.html?originUrl=${encodedUrl}`),
       })
       return
     }
 
-    chrome.tabs.update(tabId, {
-      url: chrome.runtime.getURL(`unavailable.html?${window.btoa(url)}`),
-    })
-    await registry.add(hostname)
     await proxy.setProxy()
+    chrome.tabs.update(tabId, {
+      url: chrome.runtime.getURL(`unavailable.html?originUrl=${encodedUrl}`),
+    })
     return
   }
 
@@ -126,37 +133,36 @@ const handleNotificationButtonClicked = async (notificationId, buttonIndex) => {
 
 chrome.notifications.onButtonClicked.addListener(handleNotificationButtonClicked)
 
-const handleTabState = async () => {
-  const { enableExtension } = await storage.get({ enableExtension: true })
-  const [{ url, id }] = await asynchrome.tabs.query({
-    active: true,
-    lastFocusedWindow: true,
-  })
+const handleTabState = async (tabId, changeInfo, tab) => {
+  if (changeInfo && changeInfo.status === chrome.tabs.TabStatus.COMPLETE) {
+    const extensionEnabled = await settings.extensionEnabled()
 
-  if (enableExtension && validateUrl(url)) {
-    if (ignore.contains(url)) {
-      return
-    }
+    if (extensionEnabled && isValidURL(tab.url)) {
+      if (ignore.contains(tab.url)) {
+        return
+      }
 
-    const { domainFound } = await registry.domainsContains(url)
-    const { url: distributorUrl, cooperationRefused } =
-      await registry.distributorsContains(url)
+      const urlBlocked = await registry.contains(tab.url)
+      const { url: distributorUrl, cooperationRefused } =
+        await registry.distributorsContains(tab.url)
 
-    if (domainFound) {
-      settings.setBlockedIcon(id)
-      return
-    }
+      if (urlBlocked) {
+        settings.setBlockedIcon(tabId)
+        return
+      }
 
-    if (distributorUrl) {
-      settings.setDangerIcon(id)
-      if (!cooperationRefused) {
-        await showCooperationAcceptedWarning(url)
+      if (distributorUrl) {
+        settings.setDangerIcon(tabId)
+        if (!cooperationRefused) {
+          await showCooperationAcceptedWarning(tab.url)
+        }
       }
     }
-  } else {
-    settings.setDisableIcon(id)
   }
 }
+
+chrome.tabs.onActivated.addListener(handleTabState)
+chrome.tabs.onUpdated.addListener(handleTabState)
 
 const showCooperationAcceptedWarning = async (url) => {
   const hostname = extractHostnameFromUrl(url)
@@ -167,11 +173,7 @@ const showCooperationAcceptedWarning = async (url) => {
       showNotifications: true,
     })
 
-  if (showNotifications) {
-    if (mutedForever.includes(hostname)) {
-      return
-    }
-
+  if (showNotifications && !mutedForever.includes(hostname)) {
     if (!notifiedHosts.includes(hostname)) {
       await asynchrome.notifications.create({
         type: 'basic',
@@ -209,38 +211,40 @@ const handleInstalled = async ({ reason }) => {
     }])
   })
 
-  if (reason === 'install') {
-    chrome.tabs.create({
-      url: chrome.runtime.getURL('installed.html'),
-    })
+  const reasonsForSync = [
+    chrome.runtime.OnInstalledReason.INSTALL,
+    chrome.runtime.OnInstalledReason.UPDATE,
+  ]
 
+  if (reasonsForSync.includes(reason)) {
     const synchronized = await registry.sync()
 
     if (synchronized) {
-      settings.enableExtension()
       await proxy.setProxy()
+      await settings.enableExtension()
     }
+  }
+
+  if (reason === chrome.runtime.OnInstalledReason.INSTALL) {
+    chrome.tabs.create({
+      url: chrome.runtime.getURL('installed.html'),
+    })
   }
 }
 
 chrome.runtime.onInstalled.addListener(handleInstalled)
 
 const handleTabCreate = async ({ id }) => {
-  const { enableExtension } = await storage.get({ enableExtension: true })
+  const extensionEnabled = await settings.extensionEnabled()
 
-  if (enableExtension) {
-    settings.setDefaultIcon(id)
-  } else {
+  if (extensionEnabled === false) {
     settings.setDisableIcon(id)
+  } else if (extensionEnabled === true) {
+    settings.setDefaultIcon(id)
   }
 }
 
 chrome.tabs.onCreated.addListener(handleTabCreate)
-
-chrome.runtime.onStartup.addListener(async () => {
-  await registry.sync()
-  await handleTabState()
-})
 
 chrome.windows.onRemoved.addListener(async (_windowId) => {
   await storage.remove(['notifiedHosts'])
@@ -250,23 +254,19 @@ chrome.proxy.onProxyError.addListener((details) => {
   console.error(`Proxy error: ${JSON.stringify(details)}`)
 })
 
-chrome.tabs.onActivated.addListener(handleTabState)
-chrome.tabs.onUpdated.addListener(handleTabState)
-
-// The mechanism for controlling handlers from popup.js
-window.censortracker.events = {
-  has: () => {
+const webRequestListeners = {
+  activated: () => {
     return (
       chrome.webRequest.onErrorOccurred.hasListener(handleErrorOccurred) &&
       chrome.webRequest.onBeforeRequest.hasListener(handleBeforeRequest)
     )
   },
-  remove: () => {
+  deactivate: () => {
     chrome.webRequest.onErrorOccurred.removeListener(handleErrorOccurred)
     chrome.webRequest.onBeforeRequest.removeListener(handleBeforeRequest)
-    console.warn('CensorTracker: listeners removed')
+    console.warn('Web request listeners disabled')
   },
-  add: () => {
+  activate: () => {
     chrome.webRequest.onErrorOccurred.addListener(
       handleErrorOccurred,
       getRequestFilter({ http: true, https: true }),
@@ -276,6 +276,60 @@ window.censortracker.events = {
       getRequestFilter({ http: true, https: false }),
       ['blocking'],
     )
-    console.warn('CensorTracker: listeners added')
+    console.warn('Web request listeners enabled')
   },
 }
+
+/**
+ * Fired when one or more items change.
+ * @param changes Object describing the change. This contains one property for each key that changed.
+ * @param _areaName The name of the storage area ("sync", "local") to which the changes were made.
+ */
+const handleStorageChanged = async (changes, _areaName) => {
+  const { enableExtension, ignoredHosts, useProxy } = changes
+
+  if (ignoredHosts && ignoredHosts.newValue) {
+    ignore.save()
+  }
+
+  if (enableExtension) {
+    const newValue = enableExtension.newValue
+    const oldValue = enableExtension.oldValue
+
+    if (newValue === true && oldValue === false) {
+      await proxy.setProxy()
+
+      if (!webRequestListeners.activated()) {
+        webRequestListeners.activate()
+      }
+    }
+
+    if (newValue === false && oldValue === true) {
+      await proxy.removeProxy()
+      if (webRequestListeners.activated()) {
+        webRequestListeners.deactivate()
+      }
+    }
+  }
+
+  if (useProxy && enableExtension === undefined) {
+    const newValue = useProxy.newValue
+    const oldValue = useProxy.oldValue
+
+    const extensionEnabled = settings.extensionEnabled()
+
+    if (extensionEnabled) {
+      if (newValue === true && oldValue === false) {
+        await proxy.setProxy()
+      }
+
+      if (newValue === false && oldValue === true) {
+        await proxy.removeProxy()
+      }
+    }
+  }
+}
+
+chrome.storage.onChanged.addListener(handleStorageChanged)
+
+window.censortracker.webRequestListeners = webRequestListeners

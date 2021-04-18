@@ -6,13 +6,13 @@ const footerTrackerOff = getElementById('footerTrackerOff')
 const trackerOff = getElementById('trackerOff')
 const isOriBlock = getElementById('isOriBlock')
 const isNotOriBlock = getElementById('isNotOriBlock')
-const isForbidden = getElementById('isForbidden')
-const isNotForbidden = getElementById('isNotForbidden')
+const restrictionsApplied = getElementById('restrictionsApplied')
+const restrictionsAreNotApplied = getElementById('restrictionsAreNotApplied')
 const footerTrackerOn = getElementById('footerTrackerOn')
 const aboutOriButton = getElementById('aboutOriButton')
 const textAboutOri = getElementById('textAboutOri')
 const closeTextAboutOri = getElementById('closeTextAboutOri')
-const btnAboutForbidden = getElementById('btnAboutForbidden')
+const btnRestrictionsInfo = getElementById('btnRestrictionsInfo')
 const textAboutForbidden = getElementById('textAboutForbidden')
 const closeTextAboutForbidden = getElementById('closeTextAboutForbidden')
 const btnAboutNotForbidden = getElementById('btnAboutNotForbidden')
@@ -22,6 +22,8 @@ const btnAboutNotOri = getElementById('btnAboutNotOri')
 const textAboutNotOri = getElementById('textAboutNotOri')
 const closeTextAboutNotOri = getElementById('closeTextAboutNotOri')
 const oriSiteInfo = getElementById('oriSiteInfo')
+const restrictionDescription = getElementById('restriction-description')
+const restrictionType = getElementById('restriction-type')
 const currentDomainBlocks = document.querySelectorAll('.current-domain')
 const popupShowTimeout = 60
 
@@ -56,20 +58,27 @@ browser.runtime.getBackgroundPage(async ({ censortracker: bgModules }) => {
     element.innerText = currentHostname
   })
 
+  const { restriction } = await bgModules.registry.getUnregisteredRecordByURL(currentHostname)
+
+  if (restriction && restriction.name) {
+    restrictionType.innerText = restriction.name
+    restrictionDescription.innerText = restriction.description
+  }
+
   if (enableExtension) {
     changeStatusImage('normal')
     renderCurrentDomain(currentHostname)
     footerTrackerOn.removeAttribute('hidden')
 
-    const { domainFound } = await bgModules.registry.domainsContains(currentHostname)
+    const urlBlocked = await bgModules.registry.contains(currentHostname)
 
-    if (domainFound) {
+    if (urlBlocked) {
       changeStatusImage('blocked')
-      isForbidden.removeAttribute('hidden')
-      isNotForbidden.remove()
+      restrictionsApplied.removeAttribute('hidden')
+      restrictionsAreNotApplied.remove()
     } else {
-      isNotForbidden.removeAttribute('hidden')
-      isForbidden.remove()
+      restrictionsAreNotApplied.removeAttribute('hidden')
+      restrictionsApplied.remove()
       changeStatusImage('normal')
     }
 
@@ -93,7 +102,7 @@ browser.runtime.getBackgroundPage(async ({ censortracker: bgModules }) => {
       console.log('Match not found at all')
     }
 
-    if (domainFound && distributorUrl) {
+    if (urlBlocked && distributorUrl) {
       if (cooperationRefused === false) {
         changeStatusImage('ori_blocked')
       }
@@ -152,9 +161,9 @@ const hideControlElements = () => {
   trackerOff.hidden = false
   footerTrackerOff.hidden = false
   isOriBlock.hidden = true
-  isForbidden.hidden = true
+  restrictionsApplied.hidden = true
   isNotOriBlock.hidden = true
-  isNotForbidden.hidden = true
+  restrictionsAreNotApplied.hidden = true
 }
 
 aboutOriButton.addEventListener('click', () => {
@@ -181,9 +190,9 @@ closeTextAboutOri.addEventListener('click', () => {
 },
 )
 
-btnAboutForbidden.addEventListener('click', () => {
+btnRestrictionsInfo.addEventListener('click', () => {
   textAboutForbidden.style.display = 'block'
-  btnAboutForbidden.style.display = 'none'
+  btnRestrictionsInfo.style.display = 'none'
   hideOriDetails()
 },
 )
@@ -196,7 +205,7 @@ btnAboutNotForbidden.addEventListener('click', () => {
 
 closeTextAboutForbidden.addEventListener('click', () => {
   textAboutForbidden.style.display = 'none'
-  btnAboutForbidden.style.display = 'flex'
+  btnRestrictionsInfo.style.display = 'flex'
 },
 )
 
@@ -214,7 +223,7 @@ const hideOriDetails = () => {
 
 const hideForbiddenDetails = () => {
   textAboutForbidden.style.display = 'none'
-  btnAboutForbidden.style.display = 'flex'
+  btnRestrictionsInfo.style.display = 'flex'
   textAboutNotForbidden.style.display = 'none'
   btnAboutNotForbidden.style.display = 'flex'
 }
