@@ -3,7 +3,7 @@
  * @param url URL
  * @returns {boolean} true if valid otherwise false
  */
-export const validateUrl = (url) => {
+export const isValidURL = (url) => {
   const pattern = new RegExp(
     '^(https?:\\/\\/)?' +
     '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' +
@@ -88,6 +88,24 @@ export const getRequestFilter = ({ http = true, https = true, types = undefined 
 
   return { urls, types }
 }
+// TODO: Use this one
+// export const getRequestFilter = ({ http = true, https = true, types } = {}) => {
+//   const requestFilter = { urls: [] }
+//
+//   if (types && Array.isArray(types)) {
+//     requestFilter.types = types
+//   }
+//
+//   if (http) {
+//     requestFilter.urls.push('http://*/*')
+//   }
+//
+//   if (https) {
+//     requestFilter.urls.push('https://*/*')
+//   }
+//
+//   return requestFilter
+// }
 
 /**
  * Search for target in array
@@ -113,4 +131,22 @@ export const arrayContains = (array, target) => {
     }
   }
   return false
+}
+
+/**
+ * Extracts origin decoded URl.
+ * @param url Chrome extension URl.
+ * @param key Key.
+ * @returns {string|*}
+ */
+export const extractDecodedOriginUrl = (url, key = 'originUrl') => {
+  try {
+    const [, params] = url.split('?')
+    const searchParams = new URLSearchParams(params)
+    const encodedHostname = searchParams.get(key)
+
+    return window.atob(encodedHostname)
+  } catch (error) {
+    return null
+  }
 }

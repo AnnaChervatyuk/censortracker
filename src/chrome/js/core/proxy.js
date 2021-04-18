@@ -1,5 +1,9 @@
 import { asynchrome, registry, storage } from '.'
 
+const PROXY_HOST = 'proxy-ssl.roskomsvoboda.org'
+const PROXY_PORT = 33333
+const PROXY_SERVER_URL = `${PROXY_HOST}:${PROXY_PORT}`
+
 class Proxy {
   constructor () {
     this.ignoredDomains = [
@@ -11,12 +15,12 @@ class Proxy {
       this.ignoredDomains.join('|'), 'gi')
 
     setInterval(async () => {
-      await this.removeOutdatedBlockedDomains()
-    }, 60 * 1000 * 60 * 60 * 2)
+      await this.setProxy()
+    }, 60 * 60 * 5000)
   }
 
   getProxyServerUrl = () => {
-    return 'proxy-ssl.roskomsvoboda.org:33333'
+    return PROXY_SERVER_URL
   }
 
   excludeIgnoredDomains = (domains) => {
@@ -116,7 +120,7 @@ function FindProxyForURL(url, host) {
 
     request.open('GET', proxyServerUrl, true)
     request.addEventListener('error', (_error) => {
-      console.error('Error on opening port')
+      console.log('Error on opening port')
     })
     request.send(null)
   }
@@ -133,23 +137,6 @@ function FindProxyForURL(url, host) {
       await asynchrome.proxy.settings.get()
 
     return levelOfControl === 'controlled_by_this_extension'
-  }
-
-  removeOutdatedBlockedDomains = async () => {
-    const monthInSeconds = 2628000
-    let { blockedDomains } = await storage.get({ blockedDomains: [] })
-
-    if (blockedDomains) {
-      blockedDomains = blockedDomains.filter((item) => {
-        const timestamp = new Date().getTime()
-
-        return (timestamp - item.timestamp) / 1000 < monthInSeconds
-      })
-    }
-
-    await storage.set({ blockedDomains })
-    console.warn('Outdated domains has been removed.')
-    await this.setProxy()
   }
 }
 

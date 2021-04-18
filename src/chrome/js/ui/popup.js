@@ -6,13 +6,13 @@ const footerTrackerOff = getElementById('footerTrackerOff')
 const trackerOff = getElementById('trackerOff')
 const isOriBlock = getElementById('isOriBlock')
 const isNotOriBlock = getElementById('isNotOriBlock')
-const isForbidden = getElementById('isForbidden')
-const isNotForbidden = getElementById('isNotForbidden')
+const restrictionsApplied = getElementById('restrictionsApplied')
+const restrictionsAreNotApplied = getElementById('restrictionsAreNotApplied')
 const footerTrackerOn = getElementById('footerTrackerOn')
 const aboutOriButton = getElementById('aboutOriButton')
 const textAboutOri = getElementById('textAboutOri')
 const closeTextAboutOri = getElementById('closeTextAboutOri')
-const btnAboutForbidden = getElementById('btnAboutForbidden')
+const btnRestrictionsInfo = getElementById('btnRestrictionsInfo')
 const textAboutForbidden = getElementById('textAboutForbidden')
 const closeTextAboutForbidden = getElementById('closeTextAboutForbidden')
 const btnAboutNotForbidden = getElementById('btnAboutNotForbidden')
@@ -23,6 +23,8 @@ const textAboutNotOri = getElementById('textAboutNotOri')
 const closeTextAboutNotOri = getElementById('closeTextAboutNotOri')
 const oriSiteInfo = getElementById('oriSiteInfo')
 const currentDomainBlocks = document.querySelectorAll('.current-domain')
+const restrictionDescription = getElementById('restriction-description')
+const restrictionType = getElementById('restriction-type')
 const controlledOtherExtensionsInfo = document.getElementById('controlledOtherExtensionsInfo')
 const popupShowTimeout = 60
 
@@ -48,20 +50,27 @@ chrome.runtime.getBackgroundPage(async ({ censortracker: bgModules }) => {
     element.innerText = currentHostname
   })
 
+  const { restriction } = await bgModules.registry.getUnregisteredRecordByURL(currentHostname)
+
+  if (restriction && restriction.name) {
+    restrictionType.innerText = restriction.name
+    restrictionDescription.innerText = restriction.description
+  }
+
   if (enableExtension) {
     changeStatusImage('normal')
     renderCurrentDomain(currentHostname)
     footerTrackerOn.removeAttribute('hidden')
 
-    const { domainFound } = await registry.domainsContains(currentHostname)
+    const urlBlocked = await registry.contains(currentHostname)
 
-    if (domainFound) {
+    if (urlBlocked) {
       changeStatusImage('blocked')
-      isForbidden.removeAttribute('hidden')
-      isNotForbidden.remove()
+      restrictionsApplied.removeAttribute('hidden')
+      restrictionsAreNotApplied.remove()
     } else {
-      isNotForbidden.removeAttribute('hidden')
-      isForbidden.remove()
+      restrictionsAreNotApplied.removeAttribute('hidden')
+      restrictionsApplied.remove()
       changeStatusImage('normal')
     }
 
@@ -85,7 +94,7 @@ chrome.runtime.getBackgroundPage(async ({ censortracker: bgModules }) => {
       console.log('Match not found at all')
     }
 
-    if (domainFound && distributorUrl) {
+    if (urlBlocked && distributorUrl) {
       if (cooperationRefused === false) {
         changeStatusImage('ori_blocked')
       }
@@ -107,19 +116,15 @@ chrome.runtime.getBackgroundPage(async ({ censortracker: bgModules }) => {
   setTimeout(show, popupShowTimeout)
 })
 
-const addExtensionControlListeners = async ({ settings, proxy, events }) => {
+const addExtensionControlListeners = async ({ settings }) => {
   document.addEventListener('click', (event) => {
     if (event.target.matches('#enableExtension')) {
       settings.enableExtension()
-      proxy.setProxy()
-      events.add()
       window.location.reload()
     }
 
     if (event.target.matches('#disableExtension')) {
-      proxy.removeProxy()
       settings.disableExtension()
-      events.remove()
       window.location.reload()
     }
 
@@ -173,9 +178,9 @@ const hideControlElements = () => {
   trackerOff.hidden = false
   footerTrackerOff.hidden = false
   isOriBlock.hidden = true
-  isForbidden.hidden = true
+  restrictionsApplied.hidden = true
   isNotOriBlock.hidden = true
-  isNotForbidden.hidden = true
+  restrictionsAreNotApplied.hidden = true
 }
 
 aboutOriButton.addEventListener('click', () => {
@@ -202,9 +207,9 @@ closeTextAboutOri.addEventListener('click', () => {
 },
 )
 
-btnAboutForbidden.addEventListener('click', () => {
+btnRestrictionsInfo.addEventListener('click', () => {
   textAboutForbidden.style.display = 'block'
-  btnAboutForbidden.style.display = 'none'
+  btnRestrictionsInfo.style.display = 'none'
   hideOriDetails()
 },
 )
@@ -217,7 +222,7 @@ btnAboutNotForbidden.addEventListener('click', () => {
 
 closeTextAboutForbidden.addEventListener('click', () => {
   textAboutForbidden.style.display = 'none'
-  btnAboutForbidden.style.display = 'flex'
+  btnRestrictionsInfo.style.display = 'flex'
 },
 )
 
@@ -235,7 +240,7 @@ const hideOriDetails = () => {
 
 const hideForbiddenDetails = () => {
   textAboutForbidden.style.display = 'none'
-  btnAboutForbidden.style.display = 'flex'
+  btnRestrictionsInfo.style.display = 'flex'
   textAboutNotForbidden.style.display = 'none'
   btnAboutNotForbidden.style.display = 'flex'
 }

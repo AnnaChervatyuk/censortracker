@@ -1,23 +1,27 @@
 {
   "name": "censortracker",
-  "version": "3.0.0+101",
+  "version": "3.5.0",
   "description": "|",
   "author": "Roskomsvoboda",
   "license": "MIT",
   "main": "dist/index.js",
   "scripts": {
-    "build:chrome": "webpack --progress --config webpack.chrome.config.js",
-    "build:firefox": "webpack --progress --config webpack.firefox.config.js",
+    "build:chrome": "NODE_ENV=development BROWSER=chrome webpack --progress --config webpack.config.js",
+    "build:firefox": "NODE_ENV=development BROWSER=firefox webpack --progress --config webpack.config.js",
+    "build:chrome:prod": "NODE_ENV=production BROWSER=chrome webpack --progress --config webpack.config.js",
+    "build:firefox:prod": "NODE_ENV=production BROWSER=firefox webpack --progress --config webpack.config.js",
+    "release:firefox": "web-ext build -o --source-dir=./dist/firefox/prod --artifacts-dir=./releases/firefox",
+    "release:chrome": "web-ext build -o --source-dir=./dist/chrome/prod --artifacts-dir=./releases/chrome",
     "lint": "eslint --ext=.js ./src/",
+    "stylelint": "stylelint ./src/",
     "lint:fix": "eslint --fix --ext=.js ./src/ tests/",
-    "debug:firefox": "web-ext run --source-dir=dist/firefox",
-    "watch:chrome": "webpack --watch --progress --config webpack.chrome.config.js",
-    "watch:firefox": "webpack --watch --progress --config webpack.firefox.config.js",
     "test": "jest && rm -f key.pem tests/e2e/selenium/extension/dist.crx",
     "test:unit": "jest tests/unit",
     "test:e2e": "jest tests/e2e/ && rm -f key.pem tests/e2e/selenium/extension/dist.crx"
   },
   "dependencies": {
+    "codemirror": "^5.60.0",
+    "crx": "^5.0.1",
     "ip-range-check": "^0.2.0"
   },
   "devDependencies": {

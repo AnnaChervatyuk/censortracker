@@ -22,18 +22,11 @@
       <div class="main-page__block" id="isNotOriBlock" hidden>
         <div class="block__title">
           <span>Не является организатором распространения информации</span>
-          <svg class="icon__status" width="18" height="13" viewBox="0 0 18 13" fill="none"
-               xmlns="http://www.w3.org/2000/svg">
-            <path d="M17 1L6 12L1 7" stroke="#6C9E2C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+          <img class="icon__status" src="images/icons/status/icon_ok.svg" width="24px" height="24px" alt=""/>
         </div>
         <div class="block__btn btn-about" id="btnAboutNotOri">
           <span>что это значит</span>
-          <svg class="block__btn icon" width="8" height="6" viewBox="0 0 8 6" fill="none"
-               xmlns="http://www.w3.org/2000/svg">
-            <path d="M0.546875 1.47339L4 5.5L7.48204 1.47339" stroke="#3B332B" stroke-linecap="round"
-                  stroke-linejoin="round"/>
-          </svg>
+          <img class="block__btn icon" src="images/icons/status/arrow_down.svg" width="8px" height="6px" alt=""/>
         </div>
         <div class="block__text text-normal" id="textAboutNotOri">
           <span>
@@ -55,11 +48,7 @@
         </div>
         <div class="block__btn btn-about" id="aboutOriButton">
           <span>что это значит</span>
-          <svg class="block__btn icon" width="8" height="6" viewBox="0 0 8 6" fill="none"
-               xmlns="http://www.w3.org/2000/svg">
-            <path d="M0.546875 1.47339L4 5.5L7.48204 1.47339" stroke="#3B332B" stroke-linecap="round"
-                  stroke-linejoin="round"/>
-          </svg>
+          <img class="block__btn icon" src="images/icons/status/arrow_down.svg" width="8px" height="6px" alt=""/>
         </div>
         <div class="block__text text-warning" id="textAboutOri">
           <span id="oriSiteInfo">
@@ -74,21 +63,14 @@
         </div>
       </div>
 
-      <div class="main-page__block" id="isNotForbidden" hidden>
+      <div class="main-page__block" id="restrictionsAreNotApplied" hidden>
         <div class="block__title">
           <span>Не запрещён в России</span>
-          <svg class="icon__status" width="18" height="13" viewBox="0 0 18 13" fill="none"
-               xmlns="http://www.w3.org/2000/svg">
-            <path d="M17 1L6 12L1 7" stroke="#6C9E2C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+          <img class="icon__status" src="images/icons/status/icon_ok.svg" width="24px" height="24px" alt=""/>
         </div>
         <div class="block__btn btn-about" id="btnAboutNotForbidden">
           <span>что это значит</span>
-          <svg class="block__btn icon" width="8" height="6" viewBox="0 0 8 6" fill="none"
-               xmlns="http://www.w3.org/2000/svg">
-            <path d="M0.546875 1.47339L4 5.5L7.48204 1.47339" stroke="#3B332B" stroke-linecap="round"
-                  stroke-linejoin="round"/>
-          </svg>
+          <img class="block__btn icon" src="images/icons/status/arrow_down.svg" width="8px" height="6px" alt=""/>
         </div>
         <div class="block__text text-normal" id="textAboutNotForbidden">
           <span>Если доступ к сайту запретят, то Censor Tracker предложит открыть сайт через надёжный прокси.</span>
@@ -100,21 +82,17 @@
         </div>
       </div>
 
-      <div class="main-page__block" id="isForbidden" hidden>
+      <div class="main-page__block" id="restrictionsApplied" hidden>
         <div class="block__title">
-          <span>Запрещён в России</span>
+          <span id="restriction-type">Запрещён в России</span>
           <img class="icon__status" src="images/icons/status/icon_info.svg" width="24px" height="24px" alt=""/>
         </div>
-        <div class="block__btn btn-about" id="btnAboutForbidden">
+        <div class="block__btn btn-about" id="btnRestrictionsInfo">
           <span>что это значит</span>
-          <svg class="block__btn icon" width="8" height="6" viewBox="0 0 8 6" fill="none"
-               xmlns="http://www.w3.org/2000/svg">
-            <path d="M0.546875 1.47339L4 5.5L7.48204 1.47339" stroke="#3B332B" stroke-linecap="round"
-                  stroke-linejoin="round"/>
-          </svg>
+          <img class="block__btn icon" src="images/icons/status/arrow_down.svg" width="8px" height="6px" alt=""/>
         </div>
         <div class="block__text text-normal" id="textAboutForbidden">
-          <span>Доступ к сайту запрещён, но Censor Tracker даёт к нему доступ через надёжный прокси.</span>
+          <span id="restriction-description">Доступ к сайту запрещён, но Censor Tracker даёт к нему доступ через надёжный прокси.</span>
           <div class="block__footer">
             <span class="block__btn btn-ok" id="closeTextAboutForbidden">Ясно</span>
             <span class="block__btn btn-text"><a href="https://reestr.rublacklist.net/" target="_blank">Подробнее <span
@@ -131,7 +109,7 @@
           </div>
           <div class="censor-tracker__btn btn-on" id="enableExtension">
             <img class="image__turn-tracker image__turn-tracker-on"
-                 src="images/icons/512x512/btn_pover.svg" width="36px"
+                 src="images/icons/512x512/btn_power.svg" width="36px"
                  height="36px" alt=""/>
           </div>
         </div>
@@ -145,11 +123,6 @@
   </div>
 
   <div class="footer" id="footerTrackerOn" hidden>
-    <div class="block__btn btn-text buy-vpn" style="display: none">
-      <a target="_blank" href="https://vpnlove.me/">
-        Купить VPN <span class="footer__arrow">&rarr;</span>
-      </a>
-    </div>
     <div class="censor-tracker censor-tracker-">
       <div class="censor-tracker__column">
         <div class="censor-tracker__title">Censor Tracker</div>
