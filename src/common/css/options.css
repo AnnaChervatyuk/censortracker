@@ -157,9 +157,14 @@ a {
 
 .main-page__turn:hover,
 .toggle-text:hover,
-.main-page__link:hover > span {
+.main-page__link:hover > span,
+.use_propxy__link:hover {
   color: #625c55;
   cursor: pointer;
+}
+
+.use_propxy__link {
+  color: #5173D3;
 }
 
 .toggle-text:focus,
@@ -180,6 +185,9 @@ a {
   margin-right: 70px;
 }
 
+.use_propxy__text {
+  margin-bottom: 10px;
+}
 .extension__text {
   margin-bottom: 20px;
 }
