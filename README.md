@@ -1,44 +1,25 @@
-CensorTracker: Bypass Censorship
-================================
-
-[![Logo](/.github/media/censortracker_popup_en.png)](https://github.com/roskomsvoboda/censortracker)
+[![Logo](/.github/media/promo-logo.png)](https://github.com/roskomsvoboda/censortracker)
 
 ![Build](https://github.com/roskomsvoboda/censortracker/workflows/Build/badge.svg?branch=master)
 [![CodeFactor](https://www.codefactor.io/repository/github/roskomsvoboda/censortracker/badge)](https://www.codefactor.io/repository/github/roskomsvoboda/censortracker)
+[![Chrome Web Store](https://img.shields.io/chrome-web-store/v/gaidoampbkcknofoejhnhbhbhhifgdop)](https://chrome.google.com/webstore/detail/censor-tracker/gaidoampbkcknofoejhnhbhbhhifgdop)
+[![Mozilla Add-on](https://img.shields.io/amo/v/censor-tracker)](https://addons.mozilla.org/ru/firefox/addon/censor-tracker/)
 
-**CensorTracker** is an extension for [Google Chrome] and [Mozilla Firefox] which helps to bypass censorship and to detect websites blocked through the DPI filters.
+**CensorTracker** is a censorship circumvention extension for [Google Chrome] and [Mozilla Firefox].
 
 [<img src="/.github/media/chrome-web-store.png" title="Chrome Web Store" width="170" height="48" />](https://chrome.google.com/webstore/detail/censor-tracker/gaidoampbkcknofoejhnhbhbhhifgdop)
 [<img src="/.github/media/firefox-add-ons.png" title="Firefox Add-ons" width="170" height="48" />](https://addons.mozilla.org/ru/firefox/addon/censor-tracker/)
 
-
 Features
 ========
 
-CensorTracker provides a lot of useful features, here are the most
-important:
+CensorTracker provides a lot of useful features, here are the most important:
 
 - Configurable proxy
 - Country-specific proxying
-- Detects [DPI]-filtration
-- Bypass censorship and restrictions
+- Custom proxying list
+- Bypass censorship and restrictions (including [DPI]-filtration)
 - Warns about sites that transfer data to third parties
-
-
-How does DPI-filters detection work?
-====================================
-
-<img src="/.github/media/dpi-diagram.svg" style="width:500px;"/>
-
-
-What about this "Report DPI-filter" thing?
-==========================================
-
-We are collecting anonymized data to check the availability issues of the websites for users from different parts of the country. Such data helps us to extend the list of blocked websites for proxying them and fastly react to new acts of censorship.
-
-Our backend is open source, so you can check how it works: [censortracker_backend](https://github.com/roskomsvoboda/censortracker_backend)
-
-This is an **experimental** feature and can be removed in future releases if it turns out that it is an ineffective way to detect censorship.
 
 Development
 ===========
@@ -48,12 +29,11 @@ Prerequisites
 
 Make sure you have required versions of `node` and `npm`, which are:
 
-- `node v15.4.0` or higher
-- `npm 7.6.3` or higher
+- `node v17.4.0` or higher
+- `npm 8.3.1` or higher
 
 Optionally, you may like:
 
-- `docker`
 - [`nvm`](https://github.com/nvm-sh/nvm)
 
 
@@ -68,17 +48,7 @@ so make sure you're using the latest ones.
 We've tested CensorTracker on the following versions:
 
 - Mozilla Firefox 80 or higher
-- Google Chrome 80 or higher
-
-Docker
-------
-
-You can use `docker` to avoid installation of all the requirements globally:
-
-```bash
-~ docker-compose build
-~ docker-compose run ct npm run build:{BROWSER}
-```
+- Google Chrome 90 or higher
 
 Installation
 ------------
@@ -117,30 +87,6 @@ and for Firefox like this:
     ~ npm run build:firefox:prod
     ~ npm run release:firefox
     ~ cd release/firefox
-
-**Attention**: Webpack automatically increments a key `version` in the `manifest.json` file on *every build*.
-To prevent such behavior you need to add `BUILDUP=0` before the `npm run` command, just like that:
-
-    ~ BUILDUP=0 npm run build:firefox:prod
-
-Testing
--------
-
-
-To run all the kind of tests just run following command:
-
-    ~ npm run test
-
-to run just unit tests:
-
-    ~ npm run test:unit
-
-and to run end-to-end tests you need too add `chromedriver` to your `$PATH` and then run this command:
-
-    ~ npm run test:e2e
-
-**Attention**: e2e tests works only on unix systems and requires OpenSSL for generating chrome extension id.
-
 
 License
 =======

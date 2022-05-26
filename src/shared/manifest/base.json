@@ -1,0 +1,38 @@
+{
+  "name": "__MSG_appName__",
+  "description": "__MSG_appDesc__",
+  "author": "__MSG_appAuthor__",
+  "default_locale": "en",
+  "homepage_url": "https://censortracker.org/",
+  "icons": {
+    "16": "images/icons/16x16/default.png",
+    "48": "images/icons/48x48/default.png",
+    "128": "images/icons/128x128/default.png"
+  },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.rt.com/*",
+        "*://*.1tv.ru/*",
+        "*://*.ntv.ru/*",
+        "*://ren.tv/*",
+        "*://topspb.tv/*",
+        "*://*.5-tv.ru/*",
+        "*://78.ru/*",
+        "*://*.interfax.ru/*",
+        "*://tass.ru/*",
+        "*://ria.ru/*",
+        "*://*.gazeta.ru/*",
+        "*://lenta.ru/*",
+        "*://iz.ru/*",
+        "*://vgtrk.ru/*"
+      ],
+      "css": ["css/parental-control.css"],
+      "js": ["content-scripts/parental-control.js"]
+    }
+  ]
+}

@@ -8,13 +8,12 @@ const CopyWebpackPlugin = require('copy-webpack-plugin')
 const HTMLWebpackPlugin = require('html-webpack-plugin')
 const MergeJsonWebpackPlugin = require('merge-jsons-webpack-plugin')
 
-const EXTENSION_NAME = 'Censor Tracker'
+const extensionName = 'CensorTracker'
 
-function resolve (dir) {
+function resolve(dir) {
   return path.join(__dirname, dir)
 }
 
-const BUILDUP = process.env.BUILDUP || '1'
 const BROWSER = process.env.BROWSER
 const NODE_ENV = process.env.NODE_ENV || 'development'
 const PRODUCTION = NODE_ENV === 'production'
@@ -24,48 +23,18 @@ const isFirefox = BROWSER === 'firefox'
 const isChromium = BROWSER === 'chrome'
 
 const contentSecurityPolicy = {
-  'Content-Security-Policy': 'script-src \'self\'; object-src \'self\'; ' +
-    'style-src \'self\' https://fonts.googleapis.com; ' +
-    'font-src \'self\' https://fonts.gstatic.com ',
+  'Content-Security-Policy': `script-src 'self'; object-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com`,
 }
 
-const updateVersionInManifest = () => {
-  const manifestFile = `./src/${BROWSER}/manifest/${BROWSER}.json`
-  const file = fs.readFileSync(resolve(manifestFile))
-  const object = JSON.parse(file)
-
-  const [major, minor, patch] = object.version.split('.')
-
-  object.version = `${major}.${minor}.${parseInt(patch) + 1}.0`
-  fs.writeFileSync(manifestFile, JSON.stringify(object, null, '  '))
-}
-
-if (BUILDUP === '1') {
-  updateVersionInManifest()
-}
-
-const webpackConfig = {
+const webWorkerConfig = {
   mode: NODE_ENV,
-  // Also see: https://webpack.js.org/configuration/devtool/#devtool
-  devtool: 'source-map',
-
+  target: isFirefox ? 'webworker' : 'web',
   entry: {
-    background: `./src/${BROWSER}/js/background.js`,
-    unavailable: `./src/${BROWSER}/js/ui/unavailable.js`,
-    popup: './src/common/js/ui/popup.js',
-    options: './src/common/js/ui/options.js',
-    proxy_options: './src/common/js/ui/proxy_options.js',
-    proxy_disabled: `./src/${BROWSER}/js/ui/proxy_disabled.js`,
-    ignore_editor: './src/common/js/ui/ignore_editor.js',
-    proxied_websites_editor: './src/common/js/ui/proxied_websites_editor.js',
-    translator: './src/common/js/ui/translator.js',
+    background: './src/chrome/js/background.js',
   },
-
   output: {
-    path: resolve(`dist/${BROWSER}/${OUTPUT_SUB_DIR}`),
-    libraryTarget: 'var',
+    path: resolve(`dist/chrome/${OUTPUT_SUB_DIR}`),
     filename: '[name].js',
-    // filename: `[name]${PRODUCTION ? '.min' : ''}.js`,
     publicPath: PRODUCTION ? '' : '/',
   },
 
@@ -73,7 +42,14 @@ const webpackConfig = {
     extensions: ['.js', '.ts', '.json'],
     alias: {
       '@': resolve('src'),
+      'Background': resolve('src/shared/js/background'),
     },
+  },
+
+  optimization: {
+    minimize: true,
+    minimizer: [],
+    moduleIds: 'named',
   },
 
   module: {
@@ -92,6 +68,74 @@ const webpackConfig = {
           resolve('src'),
         ],
       },
+    ],
+  },
+
+}
+
+const webConfig = {
+  mode: NODE_ENV,
+  // Also see: https://webpack.js.org/configuration/devtool/#devtool
+  target: 'web',
+  devtool: 'source-map',
+  entry: {
+    'popup': './src/shared/js/pages/popup.js',
+    'options': './src/shared/js/pages/options.js',
+    'advanced-options': './src/shared/js/pages/advanced-options.js',
+    'proxy-options': './src/shared/js/pages/proxy-options.js',
+    'ignore-editor': './src/shared/js/pages/ignore-editor.js',
+    'proxied-websites-editor': './src/shared/js/pages/proxied-websites-editor.js',
+    'translator': './src/shared/js/pages/translator.js',
+  },
+  output: {
+    path: resolve(`dist/${BROWSER}/${OUTPUT_SUB_DIR}`),
+    filename: '[name].js',
+    publicPath: PRODUCTION ? '' : '/',
+  },
+  resolve: {
+    extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
+    alias: {
+      '@': resolve('src'),
+      'Background': resolve('src/shared/js/background'),
+    },
+  },
+  module: {
+    rules: [
+      { test: /\.css$/, use: ['style-loader', 'css-loader']},
+      {
+        test: /\.svg$/,
+        use: [
+          {
+            loader: 'svg-url-loader',
+            options: {
+              noquotes: true,
+            },
+          },
+        ],
+      },
+      {
+        test: /\.js$/,
+        use: 'eslint-loader',
+        exclude: /node_modules/,
+        enforce: 'pre',
+      },
+      {
+        test: /\.(js|jsx)$/,
+        use: [
+          {
+            loader: 'babel-loader',
+          }
+        ],
+        exclude: /node_modules/,
+        include: [
+          resolve('src'),
+        ],
+      },
+      {
+        test: /\.(ts|tsx)$/,
+        loader: 'ts-loader',
+        exclude: /node_modules/,
+      },
       {
         test: /\.svg$/,
         use: 'html-loader',
@@ -100,7 +144,7 @@ const webpackConfig = {
         test: /\.(png|jpe?g|gif)$/,
         use: [
           {
-            loader: 'file-loader',
+            loader: 'asset/resource',
             options: {
               name: '[name].[ext]',
               outputPath: `dist/${BROWSER}/${OUTPUT_SUB_DIR}/images/`,
@@ -112,80 +156,61 @@ const webpackConfig = {
   },
 
   plugins: [
-    new webpack.NamedModulesPlugin(),
     new webpack.HotModuleReplacementPlugin(),
     new CopyWebpackPlugin({
       patterns: [
         {
-          from: resolve('src/common/images'),
+          from: resolve('src/shared/images'),
           to: resolve(`dist/${BROWSER}/${OUTPUT_SUB_DIR}/images`),
         },
         {
-          from: resolve('src/common/css'),
+          from: resolve('src/shared/css'),
           to: resolve(`dist/${BROWSER}/${OUTPUT_SUB_DIR}/css`),
         },
         {
-          from: resolve('src/common/_locales/'),
+          from: resolve('src/shared/_locales/'),
           to: resolve(`dist/${BROWSER}/${OUTPUT_SUB_DIR}/_locales`),
+        },
+        {
+          from: resolve('src/shared/js/content-scripts'),
+          to: resolve(`dist/${BROWSER}/${OUTPUT_SUB_DIR}/content-scripts`),
         },
       ],
     }),
     new HTMLWebpackPlugin({
-      title: EXTENSION_NAME,
+      title: extensionName,
       filename: 'popup.html',
-      template: 'src/common/pages/popup.html',
+      template: 'src/shared/pages/popup.html',
       inject: true,
-      chunks: ['popup'],
+      chunks: ['popup', 'translator'],
       meta: contentSecurityPolicy,
     }),
     new HTMLWebpackPlugin({
-      title: EXTENSION_NAME,
-      filename: 'unavailable.html',
-      template: 'src/common/pages/unavailable.html',
+      filename: 'ignore-editor.html',
+      template: 'src/shared/pages/ignore-editor.html',
       inject: true,
-      chunks: ['unavailable'],
+      chunks: ['ignore-editor', 'translator'],
       meta: contentSecurityPolicy,
     }),
     new HTMLWebpackPlugin({
-      filename: 'proxy_unavailable.html',
-      template: 'src/common/pages/proxy_unavailable.html',
+      filename: 'proxied-websites-editor.html',
+      template: 'src/shared/pages/proxied-websites-editor.html',
       inject: true,
-      chunks: ['unavailable'],
-      meta: contentSecurityPolicy,
-    }),
-    new HTMLWebpackPlugin({
-      filename: 'ignore_editor.html',
-      template: 'src/common/pages/ignore_editor.html',
-      inject: true,
-      chunks: ['ignore_editor'],
-      meta: contentSecurityPolicy,
-    }),
-    new HTMLWebpackPlugin({
-      filename: 'proxied_websites_editor.html',
-      template: 'src/common/pages/proxied_websites_editor.html',
-      inject: true,
-      chunks: ['proxied_websites_editor'],
-      meta: contentSecurityPolicy,
-    }),
-    new HTMLWebpackPlugin({
-      filename: 'proxy_disabled.html',
-      template: 'src/common/pages/proxy_disabled.html',
-      inject: true,
-      chunks: ['proxy_disabled'],
+      chunks: ['proxied-websites-editor'],
       meta: contentSecurityPolicy,
     }),
     new HTMLWebpackPlugin({
       filename: 'options.html',
-      template: 'src/common/pages/options.html',
+      template: 'src/shared/pages/options.html',
       inject: true,
-      chunks: ['options'],
+      chunks: ['options', 'translator'],
       meta: contentSecurityPolicy,
     }),
     new HTMLWebpackPlugin({
-      filename: 'advanced_options.html',
-      template: 'src/common/pages/advanced_options.html',
+      filename: 'advanced-options.html',
+      template: 'src/shared/pages/advanced-options.html',
       inject: true,
-      chunks: ['options'],
+      chunks: ['options', 'advanced-options', 'translator'],
       meta: contentSecurityPolicy,
     }),
     new MergeJsonWebpackPlugin({
@@ -193,9 +218,8 @@ const webpackConfig = {
         nosort: false,
       },
       files: [
-        './src/common/manifest/base.json',
         `./src/${BROWSER}/manifest/${BROWSER}.json`,
-        `./src/common/manifest/environments/${NODE_ENV}.json`,
+        './src/shared/manifest/base.json',
       ],
       output: {
         fileName: 'manifest.json',
@@ -205,40 +229,42 @@ const webpackConfig = {
   optimization: {
     minimize: false,
     minimizer: [],
+    moduleIds: 'named',
   },
 }
 
 if (isFirefox) {
-  webpackConfig.entry.incognito_required = `./src/${BROWSER}/js/ui/incognito_required.js`
-  webpackConfig.entry.installed = './src/firefox/js/ui/installed.js'
-  webpackConfig.plugins.push(new HTMLWebpackPlugin({
-    title: EXTENSION_NAME,
-    filename: 'incognito_required_popup.html',
-    template: 'src/firefox/pages/incognito_required_popup.html',
+  webConfig.entry.background = `./src/firefox/js/background.js`
+  webConfig.entry.incognito_required = `./src/firefox/js/pages/incognito-required.js`
+  webConfig.entry.installed = './src/firefox/js/pages/installed.js'
+  webConfig.plugins.push(new HTMLWebpackPlugin({
+    title: extensionName,
+    filename: 'incognito-required-popup.html',
+    template: 'src/firefox/pages/incognito-required-popup.html',
     inject: true,
     chunks: ['incognito_required'],
     meta: contentSecurityPolicy,
   }))
-  webpackConfig.plugins.push(new HTMLWebpackPlugin({
-    title: EXTENSION_NAME,
-    filename: 'proxy_options.html',
-    template: 'src/common/pages/proxy_options.html',
+  webConfig.plugins.push(new HTMLWebpackPlugin({
+    title: extensionName,
+    filename: 'proxy-options.html',
+    template: 'src/shared/pages/proxy-options.html',
     inject: true,
-    chunks: ['proxy_options'],
+    chunks: ['proxy-options'],
     meta: contentSecurityPolicy,
   }))
-  webpackConfig.plugins.push(new HTMLWebpackPlugin({
-    title: EXTENSION_NAME,
+  webConfig.plugins.push(new HTMLWebpackPlugin({
+    title: extensionName,
     filename: 'installed.html',
     template: 'src/firefox/pages/installed.html',
     inject: true,
     chunks: ['translator', 'installed'],
     meta: contentSecurityPolicy,
   }))
-  webpackConfig.plugins.push(new HTMLWebpackPlugin({
-    title: EXTENSION_NAME,
-    filename: 'incognito_required_tab.html',
-    template: 'src/firefox/pages/incognito_required_tab.html',
+  webConfig.plugins.push(new HTMLWebpackPlugin({
+    title: extensionName,
+    filename: 'incognito-required-tab.html',
+    template: 'src/firefox/pages/incognito-required-tab.html',
     inject: true,
     chunks: ['translator', 'incognito_required'],
     meta: contentSecurityPolicy,
@@ -246,25 +272,25 @@ if (isFirefox) {
 }
 
 if (isChromium) {
-  webpackConfig.entry.controlled = `./src/${BROWSER}/js/ui/controlled.js`
-  webpackConfig.plugins.push(new HTMLWebpackPlugin({
-    title: EXTENSION_NAME,
-    filename: 'proxy_options.html',
-    template: 'src/common/pages/proxy_options.html',
+  webConfig.entry.controlled = `./src/${BROWSER}/js/pages/controlled.js`
+  webConfig.plugins.push(new HTMLWebpackPlugin({
+    title: extensionName,
+    filename: 'proxy-options.html',
+    template: 'src/shared/pages/proxy-options.html',
     inject: true,
-    chunks: ['proxy_options', 'controlled'],
+    chunks: ['proxy-options', 'controlled'],
     meta: contentSecurityPolicy,
   }))
-  webpackConfig.plugins.push(new HTMLWebpackPlugin({
-    title: EXTENSION_NAME,
+  webConfig.plugins.push(new HTMLWebpackPlugin({
+    title: extensionName,
     filename: 'controlled.html',
     template: `src/${BROWSER}/pages/controlled.html`,
     inject: true,
     chunks: ['controlled'],
     meta: contentSecurityPolicy,
   }))
-  webpackConfig.plugins.push(new HTMLWebpackPlugin({
-    title: EXTENSION_NAME,
+  webConfig.plugins.push(new HTMLWebpackPlugin({
+    title: extensionName,
     filename: 'installed.html',
     template: `src/${BROWSER}/pages/installed.html`,
     inject: true,
@@ -276,21 +302,30 @@ if (isChromium) {
 if (PRODUCTION) {
   // See https://git.io/JmiaL
   // See https://webpack.js.org/configuration/devtool/#production
-  webpackConfig.devtool = 'none'
+  webConfig.devtool = 'nosources-source-map'
 
   // See https://webpack.js.org/configuration/optimization/#optimizationminimize
-  webpackConfig.optimization.minimize = false
-
-  // See: https://webpack.js.org/plugins/terser-webpack-plugin/
-  webpackConfig.plugins.push(new TerserPlugin({
-    terserOptions: {
-      parallel: true,
-      format: {
-        comments: false,
+  webConfig.optimization.minimize = true
+  webConfig.optimization.minimizer = [
+    new TerserPlugin({
+      terserOptions: {
+        output: {
+          comments: false,
+        },
       },
-    },
-    extractComments: false,
-  }))
+    }),
+  ]
+  webWorkerConfig.devtool = 'nosources-source-map'
+  webWorkerConfig.optimization.minimize = true
+  webWorkerConfig.optimization.minimizer = [
+    new TerserPlugin({
+      terserOptions: {
+        output: {
+          comments: false,
+        },
+      },
+    }),
+  ]
 }
 
-module.exports = webpackConfig
+module.exports = [webConfig, webWorkerConfig]
