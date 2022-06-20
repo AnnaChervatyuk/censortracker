@@ -1,11 +1,12 @@
 [![Logo](/.github/media/promo-logo.png)](https://github.com/roskomsvoboda/censortracker)
 
 ![Build](https://github.com/roskomsvoboda/censortracker/workflows/Build/badge.svg?branch=master)
+![Netlify](https://img.shields.io/netlify/1137e5c4-6b68-42a3-ab0b-804b92c482b8)
 [![CodeFactor](https://www.codefactor.io/repository/github/roskomsvoboda/censortracker/badge)](https://www.codefactor.io/repository/github/roskomsvoboda/censortracker)
 [![Chrome Web Store](https://img.shields.io/chrome-web-store/v/gaidoampbkcknofoejhnhbhbhhifgdop)](https://chrome.google.com/webstore/detail/censor-tracker/gaidoampbkcknofoejhnhbhbhhifgdop)
 [![Mozilla Add-on](https://img.shields.io/amo/v/censor-tracker)](https://addons.mozilla.org/ru/firefox/addon/censor-tracker/)
 
-**CensorTracker** is a censorship circumvention extension for [Google Chrome] and [Mozilla Firefox].
+**Censor Tracker** is a censorship circumvention extension for [Google Chrome] and [Mozilla Firefox].
 
 [<img src="/.github/media/chrome-web-store.png" title="Chrome Web Store" width="170" height="48" />](https://chrome.google.com/webstore/detail/censor-tracker/gaidoampbkcknofoejhnhbhbhhifgdop)
 [<img src="/.github/media/firefox-add-ons.png" title="Firefox Add-ons" width="170" height="48" />](https://addons.mozilla.org/ru/firefox/addon/censor-tracker/)
@@ -13,7 +14,7 @@
 Features
 ========
 
-CensorTracker provides a lot of useful features, here are the most important:
+Censor Tracker provides a lot of useful features, here are the most important:
 
 - Configurable proxy
 - Country-specific proxying
@@ -42,13 +43,13 @@ The build was tested only on the following operating systems:
 - `Ubuntu 19.10`
 - `macOS Catalina v10.15.7`
 
-We don't guarantee that CensorTracker will work on outdated versions of browsers,
+We don't guarantee that Censor Tracker will work on outdated versions of browsers,
 so make sure you're using the latest ones.
 
-We've tested CensorTracker on the following versions:
+We've tested Censor Tracker on the following versions:
 
-- Mozilla Firefox 80 or higher
-- Google Chrome 90 or higher
+- Mozilla Firefox 98 or higher
+- Google Chrome 94 or higher
 
 Installation
 ------------

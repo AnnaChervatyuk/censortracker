@@ -1,36 +1,29 @@
 import * as storage from './storage'
 import * as utilities from './utilities'
 
-const CONFIG_API_URL = 'https://app.censortracker.org/api/config/'
-const CONFIG_EXPIRATION_TIME = 60 * 60 * 3000 // 3 Hours
+const REGISTRY_API_ENDPOINT = 'https://app.censortracker.org/api/config/'
 
 class Registry {
-  async configExpired () {
-    const { registryConfigTimestamp } = await storage.get({
-      registryConfigTimestamp: utilities.timestamp(),
-    })
+  async getConfig (props = {}) {
+    if (props.debug) {
+      const { registryConfig } = await storage.get({ registryConfig: {} })
 
-    return (utilities.timestamp() - registryConfigTimestamp) >= CONFIG_EXPIRATION_TIME
-  }
-
-  async getConfig () {
-    const configExpired = await this.configExpired()
-    const { registryConfig } = await storage.get(['registryConfig'])
-
-    if (registryConfig && !configExpired) {
-      console.warn('Using cached registry config...')
       return registryConfig
     }
 
-    console.warn(`Fetching registry config from: ${CONFIG_API_URL}`)
-
     try {
-      const response = await fetch(CONFIG_API_URL)
+      const { registryAPIEndpoint } = await storage.get({
+        registryAPIEndpoint: REGISTRY_API_ENDPOINT,
+      })
+
+      console.warn(`Fetching registry config from: ${REGISTRY_API_ENDPOINT}`)
+      const response = await fetch(registryAPIEndpoint)
 
       if (response.ok) {
         const data = await response.json()
 
         if (Object.keys(data).length > 0) {
+          await storage.set({ registryConfig: data })
           const {
             specifics,
             registryUrl,
@@ -55,30 +48,19 @@ class Registry {
           }
 
           if (specifics) {
-            // There are specific data for Russia.
-            if (countryDetails.isoA2Code === 'RU') {
-              apis.push({
-                url: specifics.cooperationRefusedORIUrl,
-                storageKey: 'disseminators',
-              })
-            }
+            apis.push({
+              url: specifics.cooperationRefusedORIUrl,
+              storageKey: 'disseminators',
+            })
           }
-
-          const config = {
+          return {
             apis,
             countryDetails,
           }
-
-          await storage.set({
-            countryDetails,
-            registryConfig: config,
-            registryConfigTimestamp: utilities.timestamp(),
-          })
-          return config
         }
       }
 
-      console.warn('CensorTracker do not support your country.')
+      console.warn('Censor Tracker does not support your country.')
       return {}
     } catch (error) {
       console.error(error)
@@ -108,9 +90,7 @@ class Registry {
       }
       console.warn('Registry synced successfully.')
     } else {
-      console.error(
-        'Sync error: API endpoints are not provided for your country.',
-      )
+      console.error('Sync error: There are no API endpoints for your country.')
     }
     console.groupEnd()
     return true
