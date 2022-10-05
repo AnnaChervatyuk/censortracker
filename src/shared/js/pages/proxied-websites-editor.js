@@ -5,11 +5,10 @@ import 'codemirror/addon/display/autorefresh'
 import 'codemirror/lib/codemirror.css'
 
 import * as storage from 'Background/storage'
-import { translateDocument, validateUrls } from 'Background/utilities'
+import { parseURLStrings } from 'Background/utilities'
 import CodeMirror from 'codemirror'
 
 (async () => {
-  translateDocument(document)
   const searchInput = document.getElementById('search')
   const domainsList = document.getElementById('domainsList')
   const { customProxiedDomains } = await storage.get({
@@ -30,13 +29,13 @@ import CodeMirror from 'codemirror'
   editor.setValue(content)
 
   document.addEventListener('keydown', async (event) => {
-    if ((event.ctrlKey && event.key === 's') || event.keyCode === 13) {
+    if (event.keyCode === 13 || event.keyCode === 8) {
       const urls = editor.getValue().split('\n')
 
       await storage.set({
-        customProxiedDomains: validateUrls(urls),
+        customProxiedDomains: parseURLStrings(urls),
       })
-      console.warn('Ignore list updated')
+      console.warn('Custom proxy list updated!')
       event.preventDefault()
     }
   })

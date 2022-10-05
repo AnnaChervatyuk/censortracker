@@ -80,7 +80,7 @@ class ProxyManager {
     const pacData = await this.generateProxyAutoConfigData()
 
     if (!pacData) {
-      console.warn('Cannot set proxy: local database is empty')
+      await this.removeProxy()
       return false
     }
 
@@ -237,6 +237,21 @@ class ProxyManager {
     const { levelOfControl } = await Browser.proxy.settings.get({})
 
     return levelOfControl === 'controlled_by_this_extension'
+  }
+
+  async takeControl () {
+    const self = await Browser.management.getSelf()
+    const extensions = await Browser.management.getAll()
+
+    console.group('Taking control of proxy settings.')
+
+    for (const { id, name, permissions } of extensions) {
+      if (permissions.includes('proxy') && name !== self.name) {
+        console.warn(`Disabling ${name}...`)
+        await Browser.management.setEnabled(id, false)
+      }
+    }
+    console.groupEnd()
   }
 }
 

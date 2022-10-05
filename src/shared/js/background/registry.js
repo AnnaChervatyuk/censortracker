@@ -2,71 +2,104 @@ import * as storage from './storage'
 import * as utilities from './utilities'
 
 const REGISTRY_API_ENDPOINT = 'https://app.censortracker.org/api/config/'
+const REGISTRY_FALLBACK_CONFIG_URL = 'https://roskomsvoboda.github.io/ctconf/registry.fallback.json'
 
 class Registry {
-  async getConfig (props = {}) {
-    if (props.debug) {
-      const { registryConfig } = await storage.get({ registryConfig: {} })
+  async getFallbackConfig () {
+    let { registryFallbackConfig } = await storage.get('registryFallbackConfig')
 
-      return registryConfig
+    if (registryFallbackConfig === undefined) {
+      const response = await fetch(REGISTRY_FALLBACK_CONFIG_URL)
+
+      registryFallbackConfig = await response.json()
+
+      storage.set({ registryFallbackConfig }).then(() => {
+        console.warn('The fallback config fetched and cached.')
+      })
+      return registryFallbackConfig
     }
+    return registryFallbackConfig
+  }
+
+  async getCurrentConfig () {
+    const { registryConfig } = await storage.get({
+      registryConfig: {},
+    })
+
+    return registryConfig
+  }
+
+  async getAPIEndpoint () {
+    const {
+      currentRegionCode,
+      registryAPIEndpoint,
+    } = await storage.get({
+      currentRegionCode: '',
+      registryAPIEndpoint: REGISTRY_API_ENDPOINT,
+    })
+
+    // Modifies the URL based on the current region
+    // code if region is present.
+    return registryAPIEndpoint + currentRegionCode
+  }
+
+  async getConfig () {
+    const fallbackConfig = await this.getFallbackConfig()
 
     try {
-      const { registryAPIEndpoint } = await storage.get({
-        registryAPIEndpoint: REGISTRY_API_ENDPOINT,
-      })
+      const registryAPIEndpoint = await this.getAPIEndpoint()
 
-      console.warn(`Fetching registry config from: ${REGISTRY_API_ENDPOINT}`)
-      const response = await fetch(registryAPIEndpoint)
+      console.warn(`Fetching registry config from: ${registryAPIEndpoint}`)
+      const response = await fetch(`${registryAPIEndpoint}`)
+      const data = await response.json()
 
-      if (response.ok) {
-        const data = await response.json()
+      if (Object.keys(data).length > 0) {
+        await storage.set({ registryConfig: data })
+        const {
+          specifics,
+          registryUrl,
+          countryDetails,
+          customRegistryUrl,
+        } = data
 
-        if (Object.keys(data).length > 0) {
-          await storage.set({ registryConfig: data })
-          const {
-            specifics,
-            registryUrl,
-            countryDetails,
-            customRegistryUrl,
-          } = data
+        const apis = []
 
-          const apis = []
+        if (registryUrl) {
+          apis.push({
+            url: registryUrl,
+            storageKey: 'domains',
+          })
+        }
 
-          if (registryUrl) {
-            apis.push({
-              url: registryUrl,
-              storageKey: 'domains',
-            })
-          }
+        if (customRegistryUrl) {
+          apis.push({
+            url: customRegistryUrl,
+            storageKey: 'customRegistryRecords',
+          })
+        }
 
-          if (customRegistryUrl) {
-            apis.push({
-              url: customRegistryUrl,
-              storageKey: 'customRegistryRecords',
-            })
-          }
+        if (specifics) {
+          apis.push({
+            url: specifics.cooperationRefusedORIUrl,
+            storageKey: 'disseminators',
+          })
+        }
 
-          if (specifics) {
-            apis.push({
-              url: specifics.cooperationRefusedORIUrl,
-              storageKey: 'disseminators',
-            })
-          }
-          return {
-            apis,
-            countryDetails,
-          }
+        await storage.set({ backendIsIntermittent: false })
+        return {
+          apis,
+          countryDetails,
         }
       }
-
-      console.warn('Censor Tracker does not support your country.')
-      return {}
+      console.error('Backend is intermittent: using fallback config.')
+      await storage.set({ backendIsIntermittent: true })
+      return fallbackConfig
     } catch (error) {
-      console.error(error)
-      return {}
+      await storage.set({ backendIsIntermittent: true })
+      console.error('Backend is intermittent: using fallback config.')
+      return fallbackConfig
     }
-  };
+  }
 
   /**
    * Save JSON data from the remote resources in local storage.
@@ -75,26 +108,22 @@ class Registry {
     console.group('Registry.sync()')
     const { apis } = await this.getConfig()
 
-    if (apis.length > 0) {
-      for (const { storageKey, url } of apis) {
-        try {
-          const response = await fetch(url)
-          const data = await response.json()
+    for (const { storageKey, url } of apis) {
+      try {
+        const response = await fetch(url)
+        const data = await response.json()
 
-          console.warn(`${url} -> Fetched!`)
+        console.warn(`${url} -> Fetched!`)
 
-          await storage.set({ [storageKey]: data })
-        } catch (error) {
-          console.error(`Error on fetching data from the API endpoint: ${url}`)
-        }
+        await storage.set({ [storageKey]: data })
+      } catch (error) {
+        console.error(`Error on fetching data from the API endpoint: ${url}`)
       }
-      console.warn('Registry synced successfully.')
-    } else {
-      console.error('Sync error: There are no API endpoints for your country.')
     }
+    console.warn('Registry synced successfully.')
     console.groupEnd()
     return true
-  };
+  }
 
   /**
    * Returns unregistered records from our custom registry.
@@ -105,7 +134,7 @@ class Registry {
     })
 
     return customRegistryRecords
-  };
+  }
 
   /**
    * Return details of unregistered record by URL.
@@ -120,58 +149,69 @@ class Registry {
       }
     }
     return {}
-  };
+  }
 
   /**
    * Returns array of banned domains from the registry.
    */
   async getDomains () {
-    const { domains, blockedDomains, ignoredHosts, customProxiedDomains } =
+    const { domains, ignoredHosts, customProxiedDomains } =
       await storage.get({
         domains: [],
-        blockedDomains: [],
         ignoredHosts: [],
         customProxiedDomains: [],
       })
 
     const domainsFound = domains && domains.length > 0
-    const blockedDomainsFound = blockedDomains && blockedDomains.length > 0
     const customProxiedDomainsFound =
       customProxiedDomains && customProxiedDomains.length > 0
 
-    if (domainsFound || blockedDomainsFound || customProxiedDomainsFound) {
+    if (domainsFound || customProxiedDomainsFound) {
       try {
-        return [...domains, ...blockedDomains, ...customProxiedDomains].filter(
+        return [...domains, ...customProxiedDomains].filter(
           (element) => {
             return !ignoredHosts.includes(element)
           },
         )
       } catch (error) {
         console.error(error)
+        return []
       }
     }
     return []
-  };
+  }
+
+  async isEmpty () {
+    const domains = await this.getDomains()
+
+    return domains.length === 0
+  }
 
   /**
    * Checks if the given URL is in the registry of banned websites.
    */
   async contains (url) {
     const hostname = utilities.extractHostnameFromUrl(url)
-    const { domains, ignoredHosts, blockedDomains } = await storage.get({
+    const {
+      domains,
+      ignoredHosts,
+      customProxiedDomains,
+    } = await storage.get({
       domains: [],
       ignoredHosts: [],
-      blockedDomains: [],
+      customProxiedDomains: [],
     })
 
-    const domainsArray = domains.concat(blockedDomains)
+    if (ignoredHosts.includes(hostname)) {
+      return false
+    }
 
-    if (domainsArray.includes(hostname) && !ignoredHosts.includes(hostname)) {
-      console.log(`Registry match found: ${hostname}`)
+    if (domains.includes(hostname) || customProxiedDomains.includes(hostname)) {
+      console.log(`Registry or custom registry match found: ${hostname}`)
       return true
     }
     return false
-  };
+  }
 
   /**
    * Checks if the given URL is in registry of IDO (Information Dissemination Organizer).
@@ -190,7 +230,22 @@ class Registry {
       return dataObject
     }
     return {}
-  };
+  }
+
+  async enableRegistry () {
+    await storage.set({ useRegistry: true })
+  }
+
+  async disableRegistry () {
+    await storage.set({ useRegistry: false })
+  }
+
+  async clearRegistry () {
+    await storage.set({
+      domains: [],
+      customRegistryRecords: [],
+    })
+  }
 }
 
 export default new Registry()

@@ -151,16 +151,16 @@ export const translateDocument = (doc, props = {}) => {
  * @param urls Array of urls.
  * @returns {Array[string]} Array of valid URLs.
  */
-export const validateUrls = (urls) => {
+export const parseURLStrings = (urls) => {
   const result = new Set()
 
-  // TODO: Refactor this.
   for (const url of urls) {
-    if (url !== '' && url.indexOf('.') !== -1) {
-      let domain = url.replace(/^https?:\/\//, '').replace('www.', '')
+    if (url !== '' && url.indexOf('.') !== -1 && url.endsWith('.')) {
+      let domain = url.replace(/^https?:\/\//, '')
 
       if (domain.indexOf('/') !== -1) {
-        domain = domain.split('/', 1)
+        // Extract domain name from URL.
+        domain = domain.split('/', 1)[0]
         result.add(domain)
       } else {
         result.add(domain)

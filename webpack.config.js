@@ -7,8 +7,10 @@ const TerserPlugin = require('terser-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const HTMLWebpackPlugin = require('html-webpack-plugin')
 const MergeJsonWebpackPlugin = require('merge-jsons-webpack-plugin')
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 
-const extensionName = 'CensorTracker'
+const extensionName = 'Censor Tracker'
 
 function resolve(dir) {
   return path.join(__dirname, dir)
@@ -51,7 +53,6 @@ const webWorkerConfig = {
     minimizer: [],
     moduleIds: 'named',
   },
-
   module: {
     rules: [
       {
@@ -68,6 +69,11 @@ const webWorkerConfig = {
           resolve('src'),
         ],
       },
+      {
+        test: /\.ts$/,
+        use: 'ts-loader',
+        exclude: /node_modules/,
+      },
     ],
   },
 
@@ -83,9 +89,11 @@ const webConfig = {
     'options': './src/shared/js/pages/options.js',
     'advanced-options': './src/shared/js/pages/advanced-options.js',
     'proxy-options': './src/shared/js/pages/proxy-options.js',
+    'registry-options': './src/shared/js/pages/registry-options.js',
     'ignore-editor': './src/shared/js/pages/ignore-editor.js',
     'proxied-websites-editor': './src/shared/js/pages/proxied-websites-editor.js',
     'translator': './src/shared/js/pages/translator.js',
+    'controlled': `./src/shared/js/pages/controlled.js`
   },
   output: {
     path: resolve(`dist/${BROWSER}/${OUTPUT_SUB_DIR}`),
@@ -196,7 +204,15 @@ const webConfig = {
       filename: 'proxied-websites-editor.html',
       template: 'src/shared/pages/proxied-websites-editor.html',
       inject: true,
-      chunks: ['proxied-websites-editor'],
+      chunks: ['proxied-websites-editor', 'translator'],
+      meta: contentSecurityPolicy,
+    }),
+    new HTMLWebpackPlugin({
+      title: extensionName,
+      filename: 'registry.html',
+      template: 'src/shared/pages/registry.html',
+      inject: true,
+      chunks: ['registry-options', 'translator'],
       meta: contentSecurityPolicy,
     }),
     new HTMLWebpackPlugin({
@@ -213,6 +229,22 @@ const webConfig = {
       chunks: ['options', 'advanced-options', 'translator'],
       meta: contentSecurityPolicy,
     }),
+    new HTMLWebpackPlugin({
+      title: extensionName,
+      filename: 'proxy-options.html',
+      template: 'src/shared/pages/proxy-options.html',
+      inject: true,
+      chunks: ['proxy-options', 'controlled'],
+      meta: contentSecurityPolicy,
+    }),
+    new HTMLWebpackPlugin({
+      title: extensionName,
+      filename: 'controlled.html',
+      template: `src/shared/pages/controlled.html`,
+      inject: true,
+      chunks: ['controlled'],
+      meta: contentSecurityPolicy,
+    }),
     new MergeJsonWebpackPlugin({
       globOptions: {
         nosort: false,
@@ -225,10 +257,13 @@ const webConfig = {
         fileName: 'manifest.json',
       },
     }),
+    new MiniCssExtractPlugin(),
   ],
   optimization: {
-    minimize: false,
-    minimizer: [],
+    minimize: true,
+    minimizer: [
+      new CssMinimizerPlugin(),
+    ],
     moduleIds: 'named',
   },
 }
@@ -247,18 +282,10 @@ if (isFirefox) {
   }))
   webConfig.plugins.push(new HTMLWebpackPlugin({
     title: extensionName,
-    filename: 'proxy-options.html',
-    template: 'src/shared/pages/proxy-options.html',
-    inject: true,
-    chunks: ['proxy-options'],
-    meta: contentSecurityPolicy,
-  }))
-  webConfig.plugins.push(new HTMLWebpackPlugin({
-    title: extensionName,
     filename: 'installed.html',
     template: 'src/firefox/pages/installed.html',
     inject: true,
-    chunks: ['translator', 'installed'],
+    chunks: ['installed', 'translator'],
     meta: contentSecurityPolicy,
   }))
   webConfig.plugins.push(new HTMLWebpackPlugin({
@@ -272,23 +299,6 @@ if (isFirefox) {
 }
 
 if (isChromium) {
-  webConfig.entry.controlled = `./src/${BROWSER}/js/pages/controlled.js`
-  webConfig.plugins.push(new HTMLWebpackPlugin({
-    title: extensionName,
-    filename: 'proxy-options.html',
-    template: 'src/shared/pages/proxy-options.html',
-    inject: true,
-    chunks: ['proxy-options', 'controlled'],
-    meta: contentSecurityPolicy,
-  }))
-  webConfig.plugins.push(new HTMLWebpackPlugin({
-    title: extensionName,
-    filename: 'controlled.html',
-    template: `src/${BROWSER}/pages/controlled.html`,
-    inject: true,
-    chunks: ['controlled'],
-    meta: contentSecurityPolicy,
-  }))
   webConfig.plugins.push(new HTMLWebpackPlugin({
     title: extensionName,
     filename: 'installed.html',
@@ -306,7 +316,7 @@ if (PRODUCTION) {
 
   // See https://webpack.js.org/configuration/optimization/#optimizationminimize
   webConfig.optimization.minimize = true
-  webConfig.optimization.minimizer = [
+  webConfig.optimization.minimizer.push(
     new TerserPlugin({
       terserOptions: {
         output: {
@@ -314,7 +324,7 @@ if (PRODUCTION) {
         },
       },
     }),
-  ]
+  )
   webWorkerConfig.devtool = 'nosources-source-map'
   webWorkerConfig.optimization.minimize = true
   webWorkerConfig.optimization.minimizer = [

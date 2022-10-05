@@ -101,15 +101,16 @@ export const handleIgnoredHostsChange = async ({ ignoredHosts }, _areaName) => {
 }
 
 export const handleCustomProxiedDomainsChange = async ({ customProxiedDomains }, _areaName) => {
-  const proxyingEnabled = await ProxyManager.isEnabled()
-  const enableExtension = await Settings.extensionEnabled()
-
-  if (customProxiedDomains && customProxiedDomains.newValue) {
-    if (enableExtension && proxyingEnabled) {
-      await ProxyManager.setProxy()
-      console.warn('Updated custom proxied domains.')
-    }
-  }
+  Settings.extensionEnabled().then((enableExtension) => {
+    ProxyManager.isEnabled().then(async (proxyingEnabled) => {
+      if (customProxiedDomains && customProxiedDomains.newValue) {
+        if (enableExtension && proxyingEnabled) {
+          await ProxyManager.setProxy()
+          console.warn('Updated custom proxied domains.')
+        }
+      }
+    })
+  })
 }
 
 /**
@@ -178,7 +179,6 @@ export const handleInstalled = async ({ reason }) => {
   const UPDATED = reason === Browser.runtime.OnInstalledReason.UPDATE
   const INSTALLED = reason === Browser.runtime.OnInstalledReason.INSTALL
 
-  console.groupCollapsed('onInstall')
   // In Firefox, the UPDATE can be caused after granting incognito access.
   if (UPDATED && Browser.IS_FIREFOX) {
     const controlledByThisExtension = await ProxyManager.controlledByThisExtension()
@@ -191,6 +191,7 @@ export const handleInstalled = async ({ reason }) => {
   }
 
   if (INSTALLED) {
+    await Registry.enableRegistry()
     await Settings.enableExtension()
     await Settings.enableNotifications()
     await Settings.showInstalledPage()
@@ -214,37 +215,37 @@ export const handleInstalled = async ({ reason }) => {
       { name: 'proxy-setProxy', minutes: 10 },
     ])
   }
-  console.groupEnd()
 }
 
 export const handleTabState = async (tabId, { status = 'loading' } = {}, tab) => {
   if (status === Browser.tabs.TabStatus.LOADING) {
-    const isIgnored = await Ignore.contains(tab.url)
-    const extensionEnabled = await Settings.extensionEnabled()
+    Ignore.contains(tab.url).then((isIgnored) => {
+      Settings.extensionEnabled().then(async (extensionEnabled) => {
+        if (extensionEnabled && !isIgnored && utilities.isValidURL(tab.url)) {
+          const blocked = await Registry.contains(tab.url)
+          const { url: disseminatorUrl, cooperationRefused } =
+            await Registry.retrieveInformationDisseminationOrganizerJSON(tab.url)
 
-    if (extensionEnabled && !isIgnored && utilities.isValidURL(tab.url)) {
-      const blocked = await Registry.contains(tab.url)
-      const { url: disseminatorUrl, cooperationRefused } =
-        await Registry.retrieveInformationDisseminationOrganizerJSON(tab.url)
-
-      if (blocked) {
-        Settings.setBlockedIcon(tabId)
-      } else if (disseminatorUrl) {
-        Settings.setDangerIcon(tabId)
-        if (!cooperationRefused) {
-          await warnAboutInformationDisseminationOrganizer(tab.url)
+          if (blocked) {
+            Settings.setBlockedIcon(tabId)
+          } else if (disseminatorUrl) {
+            if (!cooperationRefused) {
+              Settings.setDangerIcon(tabId)
+              await warnAboutInformationDisseminationOrganizer(tab.url)
+            }
+          }
         }
-      }
-    }
+      })
+    })
   }
 }
 
 export const handleTabCreate = async (tab) => {
-  const extensionEnabled = await Settings.extensionEnabled()
-
-  if (extensionEnabled) {
-    Settings.setDefaultIcon(tab.id)
-  } else {
-    Settings.setDisableIcon(tab.id)
-  }
+  Settings.extensionEnabled().then((enabled) => {
+    if (enabled) {
+      Settings.setDefaultIcon(tab.id)
+    } else {
+      Settings.setDisableIcon(tab.id)
+    }
+  })
 }
