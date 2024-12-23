@@ -1,12 +1,18 @@
 import browser from './browser-api'
 
-const GITHUB_CONFIG_URL = 'https://raw.githubusercontent.com/censortracker/ctconf/main/config.json'
-
 const getConfigAPIEndpoints = () => {
   return [
     {
       endpointName: 'GitHub',
-      endpointUrl: GITHUB_CONFIG_URL,
+      endpointUrl: 'https://raw.githubusercontent.com/censortracker/ctconf/main/config.json',
+    },
+    {
+      endpointName: 'jsDelivr',
+      endpointUrl: 'https://cdn.jsdelivr.net/gh/censortracker/ctconf/config.json',
+    },
+    {
+      endpointName: 'Google',
+      endpointUrl: 'https://storage.googleapis.com/censortracker/config.json',
     },
   ]
 }
