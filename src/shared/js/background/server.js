@@ -179,7 +179,7 @@ const fetchRegistry = async ({ registryUrl, specifics = {} } = {}) => {
     return
   }
 
-  console.group('[Registry] Fetching registry...')
+  console.warn('[Registry] Fetching registry...')
 
   const apis = [{
     url: registryUrl,
@@ -205,7 +205,6 @@ const fetchRegistry = async ({ registryUrl, specifics = {} } = {}) => {
       console.error(`Error on fetching data from: ${url}`)
     }
   }
-  console.groupEnd()
 }
 
 /**
@@ -245,7 +244,7 @@ export const synchronize = async ({
   syncIgnore = true,
   syncProxy = true,
 } = {}) => {
-  console.groupCollapsed('[Server] Synchronizing config...')
+  console.group('[Server] Synchronizing config...')
 
   const config = await fetchConfig()
 
