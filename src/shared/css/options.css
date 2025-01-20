@@ -450,7 +450,7 @@ a {
 .proxy-options-inputs {
     display: flex;
     margin-left: 45px;
-    margin-bottom: 60px;
+    margin-bottom: 20px;
 }
 
 /* Ignore Editor Page */
@@ -969,7 +969,7 @@ kbd {
     :root {
         color-scheme: dark;
     }
-    
+
     .options-body, body {
         background-color: #181A1B;
         color: #F4F1F1;
@@ -1205,4 +1205,77 @@ kbd {
     .update_available {
         color-scheme: light;
     }
+}
+
+#localProxyOptions {
+  padding: 20px;
+}
+
+#localProxyOptions p {
+  font-size: 16px;
+  color: #5a5a5a;
+  margin-bottom: 10px;
+}
+
+#localProxyOptions a {
+  color: #3366cc;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+#localProxyOptions a:hover {
+  text-decoration: underline;
+}
+
+.local-proxy-disclaimer {
+  background-color: #fbecec;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  color: #5a5a5a;
+}
+
+.local-proxy-disclaimer .disclaimer__text {
+  font-size: 14px;
+  margin-bottom: 15px;
+}
+
+.btn-light {
+  color: #2c2c2c;
+  padding: 5px 20px;
+  font-size: 14px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-light:hover {
+  background-color: rgba(251, 236, 236, 0.77);
+}
+
+.proxy-code-input label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.proxy-code-input textarea {
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+  resize: none;
+  height: 150px;
+}
+
+.proxy-code-input {
+  padding-bottom: 20px;
+}
+
+
+#localProxyConfigValueDescr {
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 10px;
+  font-family: IBM Plex Sans, Arial, sans-serif;
+  color: #6d675f;
 }
