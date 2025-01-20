@@ -1,4 +1,5 @@
 import browser from 'Background/browser-api'
+import LocalProxyClient from 'Background/localproxy'
 import ProxyManager from 'Background/proxy'
 
 (async () => {
@@ -11,9 +12,11 @@ import ProxyManager from 'Background/proxy'
   const proxyOptionsInputs = document.getElementById('proxyOptionsInputs')
   const useCustomProxyRadioButton = document.getElementById('useCustomProxy')
   const useDefaultProxyRadioButton = document.getElementById('useDefaultProxy')
+  const localProxyOptions = document.getElementById('localProxyOptions')
   const proxyCustomOptionsRadioGroup = document.getElementById(
     'proxyCustomOptionsRadioGroup',
   )
+  const localProxyClientNotFound = document.getElementById('localProxyClientNotFound')
   const selectProxyProtocol = document.querySelector('.select')
   const currentProxyProtocol = document.querySelector('#select-toggle')
   const proxyProtocols = document.querySelectorAll('.select-option')
@@ -72,13 +75,26 @@ import ProxyManager from 'Background/proxy'
   })
 
   proxyCustomOptionsRadioGroup.addEventListener('change', async (event) => {
-    if (event.target.value === 'default') {
+    const id = event.target.id
+    // const value = event.target.value
+
+    if (id === 'useDefaultProxy') {
       proxyOptionsInputs.classList.add('hidden')
+      localProxyOptions.classList.add('hidden')
       proxyServerInput.value = ''
       await ProxyManager.removeCustomProxy()
       await ProxyManager.setProxy()
-    } else {
+    } else if (id === 'useCustomProxy') {
+      localProxyOptions.classList.add('hidden')
       proxyOptionsInputs.classList.remove('hidden')
+    } else if (id === 'useLocalProxy') {
+      proxyOptionsInputs.classList.add('hidden')
+      localProxyOptions.classList.remove('hidden')
+      LocalProxyClient.isRunning().then((isRunning) => {
+        localProxyClientNotFound.hidden = isRunning
+      })
+
+      console.log('selected local proxy')
     }
   })
 
