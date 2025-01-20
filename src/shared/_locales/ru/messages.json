@@ -489,6 +489,24 @@
   "useOwnProxy": {
     "message": "Свой прокси"
   },
+  "useLocalProxy": {
+    "message": "Использовать локальный прокси"
+  },
+  "localProxyNotFound": {
+    "message": "Приложение Censor Tracker Proxy не найдено на устройстве. Скачайте и запустите приложение Censor Tracker Proxy. Оно будет работать в фоновом режиме и поддерживать работу локального прокси."
+  },
+  "downloadAppButton": {
+    "message": "Скачать"
+  },
+  "localProxyConfigValueTitle": {
+    "message": "Конфиг"
+  },
+  "applyLocalProxyButton": {
+    "message": "Применить"
+  },
+  "localProxyConfigValueDescr": {
+    "message": "Вставьте конфигурацию vless://, vmess:// или ss://."
+  },
   "useProxy": {
     "message": "Использовать прокси"
   },

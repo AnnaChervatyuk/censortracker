@@ -489,8 +489,26 @@
   "useOwnProxy": {
     "message": "Свій проксі"
   },
+  "useLocalProxy": {
+    "message": "Використовувати локальний проксі"
+  },
+  "localProxyNotFound": {
+    "message": "Додаток Censor Tracker Proxy не знайдено на пристрої. Скачайте та запустіть додаток Censor Tracker Proxy. Він працюватиме у фоновому режимі та підтримуватиме роботу локального проксі."
+  },
   "useProxy": {
     "message": "Використовувати проксі"
+  },
+  "downloadAppButton": {
+    "message": "Завантажити"
+  },
+  "localProxyConfigValueTitle": {
+    "message": "Конфігурація"
+  },
+  "applyLocalProxyButton": {
+    "message": "Застосувати"
+  },
+  "localProxyConfigValueDescr": {
+    "message": "Вставте конфігурацію vless://, vmess:// або ss://."
   },
   "useProxyDesc": {
     "message": "Якщо сайт заблокований - Censor Tracker надасть до нього доступ. Вимкніть це налаштування, якщо ви користуєтеся іншим сервісом для обходу блокувань (наприклад, VPN), щоб збільшити швидкість з'єднання."
