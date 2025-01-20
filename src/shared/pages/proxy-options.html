@@ -52,32 +52,52 @@
               <input class="radio-button-input" type="radio" name="proxy-radio" id="useCustomProxy" value="custom">
               <label class="radio-button-label" for="useCustomProxy" data-i18n-key="useOwnProxy"></label>
             </div>
-          </div>
-
-          <div id="proxyOptionsInputs" class="proxy-options-inputs hidden">
-
-            <div class="select" id="selectProxyProtocol">
-              <button type="button" class="select-toggle" id="select-toggle">
-                HTTPS
-              </button>
-              <div class="select-dropdown">
-                <ul class="select-options">
-                  <li class="select-option" data-value="SOCKS4">SOCKS4</li>
-                  <li class="select-option" data-value="SOCKS5">SOCKS5</li>
-                  <li class="select-option" data-value="HTTP">HTTP</li>
-                  <li class="select-option" data-value="HTTPS">HTTPS</li>
-                </ul>
+            <div id="proxyOptionsInputs" class="proxy-options-inputs hidden">
+              <div class="select" id="selectProxyProtocol">
+                <button type="button" class="select-toggle" id="select-toggle">
+                  HTTPS
+                </button>
+                <div class="select-dropdown">
+                  <ul class="select-options">
+                    <li class="select-option" data-value="SOCKS4">SOCKS4</li>
+                    <li class="select-option" data-value="SOCKS5">SOCKS5</li>
+                    <li class="select-option" data-value="HTTP">HTTP</li>
+                    <li class="select-option" data-value="HTTPS">HTTPS</li>
+                  </ul>
+                </div>
               </div>
+
+              <input type="text"
+                     id="proxyServerInput"
+                     class="input-proxy"
+                     placeholder="[username:password@]hostname:port">
+
+              <button class="btn btn-dark" id="saveCustomProxyButton">
+                <span class="btn__text" data-i18n-key="saveCustomProxyButton"></span>
+              </button>
             </div>
 
-            <input type="text"
-                   id="proxyServerInput"
-                   class="input-proxy"
-                   placeholder="[username:password@]hostname:port">
+            <div class="radio-button">
+              <input class="radio-button-input" type="radio" name="proxy-radio" id="useLocalProxy" value="local">
+              <label class="radio-button-label" for="useLocalProxy" data-i18n-key="useLocalProxy"></label>
+            </div>
 
-            <button class="btn btn-dark" id="saveCustomProxyButton">
-              <span class="btn__text" data-i18n-key="saveCustomProxyButton"></span>
-            </button>
+            <div id="localProxyOptions" class="hidden">
+              <div id="localProxyClientNotFound" class="local-proxy-disclaimer">
+                <div class="disclaimer__text" data-i18n-key="localProxyNotFound"></div>
+                <button class="btn btn-light" id="downloadProxyAppButton" data-i18n-key="downloadAppButton"></button>
+              </div>
+
+              <div class="proxy-code-input">
+                <label for="localProxyCode" data-i18n-key="localProxyConfigValueTitle"></label>
+                <div id="localProxyConfigValueDescr" data-i18n-key="localProxyConfigValueDescr"></div>
+                <textarea id="localProxyCode" rows="3" class="input-proxy" placeholder=""></textarea>
+              </div>
+
+              <button class="btn btn-dark" id="applyLocalProxyButton">
+                <span class="btn__text" data-i18n-key="applyLocalProxyButton"></span>
+              </button>
+            </div>
           </div>
         </div>
 
