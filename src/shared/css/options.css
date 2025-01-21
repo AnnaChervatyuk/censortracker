@@ -1252,14 +1252,14 @@ kbd {
   background-color: rgba(251, 236, 236, 0.77);
 }
 
-.proxy-code-input label {
+#localProxyConfigBlock label {
   display: block;
   font-size: 14px;
   font-weight: 600;
   margin-bottom: 5px;
 }
 
-.proxy-code-input textarea {
+#localProxyConfigBlock textarea {
   width: 100%;
   padding: 10px;
   font-size: 14px;
@@ -1267,8 +1267,8 @@ kbd {
   height: 150px;
 }
 
-.proxy-code-input {
-  padding-bottom: 20px;
+#localProxyConfigBlock {
+  padding-bottom: 5px;
 }
 
 
@@ -1278,4 +1278,11 @@ kbd {
   margin-bottom: 10px;
   font-family: IBM Plex Sans, Arial, sans-serif;
   color: #6d675f;
+}
+
+#invalidLocalProxyConfig {
+  font-size: 14px;
+  font-weight: 400;
+  margin-bottom: 15px;
+  color: #f11111;
 }

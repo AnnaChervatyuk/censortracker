@@ -510,6 +510,9 @@
   "localProxyConfigValueDescr": {
     "message": "Enter your vless://, vmess:// or ss:// config."
   },
+  "invalidLocalProxyConfig": {
+    "message": "Invalid configuration, please enter valid vless://, vmess:// or ss:// configuration."
+  },
   "useProxyDesc": {
     "message": "If a website is blocked, Censor Tracker will bypass restrictions to give you access to it. Disable this setting if you use another service to bypass censorship (for example, a VPN) to increase connection speed."
   },

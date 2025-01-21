@@ -84,6 +84,26 @@ class ProxyClient {
       return true
     })
   }
+
+  validateConfig = (configUri) => {
+    const configRegex = /^(vmess|vless|ss):\/\//
+
+    if (!configRegex.test(configUri)) {
+      return false
+    }
+
+    const [protocol, path] = configUri.split('://')
+
+    if (protocol === 'vmess') {
+      try {
+        window.atob(path)
+        return true
+      } catch (error) {
+        return false
+      }
+    }
+    return true
+  }
 }
 
 export default new ProxyClient()

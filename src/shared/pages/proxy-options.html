@@ -88,15 +88,19 @@
                 <button class="btn btn-light" id="downloadProxyAppButton" data-i18n-key="downloadAppButton"></button>
               </div>
 
-              <div class="proxy-code-input">
-                <label for="localProxyCode" data-i18n-key="localProxyConfigValueTitle"></label>
-                <div id="localProxyConfigValueDescr" data-i18n-key="localProxyConfigValueDescr"></div>
-                <textarea id="localProxyCode" rows="3" class="input-proxy" placeholder=""></textarea>
-              </div>
+              <div id="localProxyForm">
+                <div id="localProxyConfigBlock">
+                  <label for="localProxyConfig" data-i18n-key="localProxyConfigValueTitle"></label>
+                  <div id="localProxyConfigValueDescr" data-i18n-key="localProxyConfigValueDescr"></div>
+                  <textarea id="localProxyConfig" rows="3" class="input-proxy"></textarea>
+                </div>
 
-              <button class="btn btn-dark" id="applyLocalProxyButton">
-                <span class="btn__text" data-i18n-key="applyLocalProxyButton"></span>
-              </button>
+                <div id="invalidLocalProxyConfig" class="hidden" data-i18n-key="invalidLocalProxyConfig"></div>
+
+                <button class="btn btn-dark" id="applyLocalProxyButton">
+                  <span class="btn__text" data-i18n-key="applyLocalProxyButton"></span>
+                </button>
+              </div>
             </div>
           </div>
         </div>

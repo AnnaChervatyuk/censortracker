@@ -507,6 +507,9 @@
   "localProxyConfigValueDescr": {
     "message": "Вставьте конфигурацию vless://, vmess:// или ss://."
   },
+  "invalidLocalProxyConfig": {
+    "message": "Неверная конфигурация, пожалуйста, введите корректную конфигурацию vless://, vmess:// или ss://."
+  },
   "useProxy": {
     "message": "Использовать прокси"
   },
