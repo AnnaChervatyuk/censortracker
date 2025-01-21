@@ -73,11 +73,15 @@ import ProxyManager from 'Background/proxy'
     if (LocalProxyClient.validateConfig(config)) {
       localProxyConfigTextarea.classList.remove('invalid-input')
       invalidLocalProxyConfig.classList.add('hidden')
-      await browser.storage.local.set({
-        localProxyConfig: config,
-        useLocalProxy: true,
-      })
-      await LocalProxyClient.setConfig(config)
+      const configSet = await LocalProxyClient.setConfig(config)
+
+      if (configSet) {
+        await browser.storage.local.set({
+          localProxyConfig: config,
+          useLocalProxy: true,
+        })
+      }
+
     } else {
       localProxyConfigTextarea.classList.add('invalid-input')
       invalidLocalProxyConfig.classList.remove('hidden')
