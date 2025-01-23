@@ -17,6 +17,9 @@
   "appName": {
     "message": "Censor Tracker – Proxy for Privacy & Security"
   },
+  "applyLocalProxyButton": {
+    "message": "Apply"
+  },
   "areYouSureYouWantToResetSettingsDesc": {
     "message": "Regenerate the PAC file for your current region and reset the settings."
   },
@@ -137,8 +140,17 @@
   "doneDescription": {
     "message": "Operation completed successfully."
   },
+  "downloadAppButton": {
+    "message": "Download"
+  },
   "emptyFileError": {
     "message": "The file is empty or damaged. Please check it and try again."
+  },
+  "exportSettingsDesc": {
+    "message": "You can export your settings to a JSON file and import them later."
+  },
+  "exportSettingsTitle": {
+    "message": "Export Settings"
   },
   "extensionDisabledTitle": {
     "message": "Censor Tracker disabled"
@@ -188,6 +200,12 @@
   "ignoredSitesTitle": {
     "message": "Ignored Websites"
   },
+  "importSettingsDesc": {
+    "message": "You can import your settings from a JSON file."
+  },
+  "importSettingsTitle": {
+    "message": "Import Settings"
+  },
   "incognitoAccessRequiredDescription": {
     "message": "To open <b>$hostname$</b> through a proxy in Firefox, you need permission to work in Private Windows. Otherwise, our proxy will not work.",
     "placeholders": {
@@ -217,8 +235,20 @@
   "installedPageTitle": {
     "message": "Censor Tracker Installed"
   },
+  "invalidLocalProxyConfig": {
+    "message": "Invalid configuration, please enter valid vless://, vmess:// or ss:// configuration."
+  },
   "invalidURLError": {
     "message": "The URL you entered is invalid. Please check it and try again."
+  },
+  "localProxyConfigValueDescr": {
+    "message": "Enter your vless://, vmess:// or ss:// config."
+  },
+  "localProxyConfigValueTitle": {
+    "message": "Config"
+  },
+  "localProxyNotFound": {
+    "message": "The Censor Tracker Proxy application is not found on your device. Download and run the Censor Tracker Proxy application. It will run in the background and keep the local proxy running."
   },
   "localRegistryUpdated": {
     "message": "Local database updated!"
@@ -486,32 +516,14 @@
   "useDefaultProxy": {
     "message": "Censor Tracker's Proxies"
   },
-  "useOwnProxy": {
-    "message": "Use your own proxy"
-  },
   "useLocalProxy": {
     "message": "Use local proxy"
   },
-  "localProxyNotFound": {
-    "message": "The Censor Tracker Proxy application is not found on your device. Download and run the Censor Tracker Proxy application. It will run in the background and keep the local proxy running."
+  "useOwnProxy": {
+    "message": "Use your own proxy"
   },
   "useProxy": {
     "message": "Use proxy"
-  },
-  "downloadAppButton": {
-    "message": "Download"
-  },
-  "localProxyConfigValueTitle": {
-    "message": "Config"
-  },
-  "applyLocalProxyButton": {
-    "message": "Apply"
-  },
-  "localProxyConfigValueDescr": {
-    "message": "Enter your vless://, vmess:// or ss:// config."
-  },
-  "invalidLocalProxyConfig": {
-    "message": "Invalid configuration, please enter valid vless://, vmess:// or ss:// configuration."
   },
   "useProxyDesc": {
     "message": "If a website is blocked, Censor Tracker will bypass restrictions to give you access to it. Disable this setting if you use another service to bypass censorship (for example, a VPN) to increase connection speed."
@@ -527,17 +539,5 @@
   },
   "youCanCloseThisWindow": {
     "message": "You can close this window"
-  },
-  "exportSettingsTitle": {
-    "message": "Export Settings"
-  },
-  "exportSettingsDesc": {
-    "message": "You can export your settings to a JSON file and import them later."
-  },
-  "importSettingsTitle": {
-    "message": "Import Settings"
-  },
-  "importSettingsDesc": {
-    "message": "You can import your settings from a JSON file."
   }
 }

@@ -17,6 +17,9 @@
   "appName": {
     "message": "Censor Tracker — Обход блокировок"
   },
+  "applyLocalProxyButton": {
+    "message": "Применить"
+  },
   "areYouSureYouWantToResetSettingsDesc": {
     "message": "Переустановить конфиг и обновить локальную базу данных"
   },
@@ -137,8 +140,17 @@
   "doneDescription": {
     "message": "Операция выполнена успешно."
   },
+  "downloadAppButton": {
+    "message": "Скачать"
+  },
   "emptyFileError": {
     "message": "Файл пустой или повреждён. Пожалуйста, проверьте его и попробуйте ещё раз."
+  },
+  "exportSettingsDesc": {
+    "message": "Вы можете экспортировать настройки Censor Tracker в файл JSON и импортировать их позже."
+  },
+  "exportSettingsTitle": {
+    "message": "Экспортировать Настройки"
   },
   "extensionDisabledTitle": {
     "message": "Censor Tracker выключен"
@@ -188,6 +200,12 @@
   "ignoredSitesTitle": {
     "message": "Игнорируемые сайты"
   },
+  "importSettingsDesc": {
+    "message": "Вы можете импортировать настройки из файла JSON."
+  },
+  "importSettingsTitle": {
+    "message": "Импортировать Настроек"
+  },
   "incognitoAccessRequiredDescription": {
     "message": "Чтобы открыть <b>$hostname$</b> через прокси в Firefox требуется разрешение на работу в приватных окнах. Иначе прокси не работает.",
     "placeholders": {
@@ -217,8 +235,20 @@
   "installedPageTitle": {
     "message": "Censor Tracker Установлен"
   },
+  "invalidLocalProxyConfig": {
+    "message": "Неверная конфигурация, пожалуйста, введите корректную конфигурацию vless://, vmess:// или ss://."
+  },
   "invalidURLError": {
     "message": "Неверный URL. Пожалуйста, проверьте его и попробуйте ещё раз."
+  },
+  "localProxyConfigValueDescr": {
+    "message": "Вставьте конфигурацию vless://, vmess:// или ss://."
+  },
+  "localProxyConfigValueTitle": {
+    "message": "Конфиг"
+  },
+  "localProxyNotFound": {
+    "message": "Приложение Censor Tracker Proxy не найдено на устройстве. Скачайте и запустите приложение Censor Tracker Proxy. Оно будет работать в фоновом режиме и поддерживать работу локального прокси."
   },
   "localRegistryUpdated": {
     "message": "Локальная база данных заблокированных сайтов обновлена!"
@@ -486,29 +516,11 @@
   "useDefaultProxy": {
     "message": "Прокси Censor Tracker"
   },
-  "useOwnProxy": {
-    "message": "Свой прокси"
-  },
   "useLocalProxy": {
     "message": "Использовать локальный прокси"
   },
-  "localProxyNotFound": {
-    "message": "Приложение Censor Tracker Proxy не найдено на устройстве. Скачайте и запустите приложение Censor Tracker Proxy. Оно будет работать в фоновом режиме и поддерживать работу локального прокси."
-  },
-  "downloadAppButton": {
-    "message": "Скачать"
-  },
-  "localProxyConfigValueTitle": {
-    "message": "Конфиг"
-  },
-  "applyLocalProxyButton": {
-    "message": "Применить"
-  },
-  "localProxyConfigValueDescr": {
-    "message": "Вставьте конфигурацию vless://, vmess:// или ss://."
-  },
-  "invalidLocalProxyConfig": {
-    "message": "Неверная конфигурация, пожалуйста, введите корректную конфигурацию vless://, vmess:// или ss://."
+  "useOwnProxy": {
+    "message": "Свой прокси"
   },
   "useProxy": {
     "message": "Использовать прокси"
@@ -527,17 +539,5 @@
   },
   "youCanCloseThisWindow": {
     "message": "Можно закрыть это окно"
-  },
-  "exportSettingsTitle": {
-    "message": "Экспортировать Настройки"
-  },
-  "exportSettingsDesc": {
-    "message": "Вы можете экспортировать настройки Censor Tracker в файл JSON и импортировать их позже."
-  },
-  "importSettingsTitle": {
-    "message": "Импортировать Настроек"
-  },
-  "importSettingsDesc": {
-    "message": "Вы можете импортировать настройки из файла JSON."
   }
 }
