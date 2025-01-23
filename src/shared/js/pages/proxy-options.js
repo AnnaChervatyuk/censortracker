@@ -75,11 +75,13 @@ import ProxyManager from 'Background/proxy'
       invalidLocalProxyConfig.classList.add('hidden')
       const configSet = await LocalProxyClient.setConfig(config)
 
-      if (configSet) {
+      if (configSet.status === 'success') {
         await browser.storage.local.set({
-          localProxyConfig: config,
           useLocalProxy: true,
+          localProxyConfig: config,
         })
+      } else {
+        console.error('Failed to set local proxy configuration.')
       }
     } else {
       localProxyConfigTextarea.classList.add('invalid-input')
