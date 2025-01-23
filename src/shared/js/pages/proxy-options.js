@@ -81,7 +81,6 @@ import ProxyManager from 'Background/proxy'
           useLocalProxy: true,
         })
       }
-
     } else {
       localProxyConfigTextarea.classList.add('invalid-input')
       invalidLocalProxyConfig.classList.remove('hidden')
