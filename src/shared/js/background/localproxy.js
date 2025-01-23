@@ -1,14 +1,38 @@
+/**
+ * API Base URL for the ProxyClient
+ * @constant {string}
+ */
 const API_BASE_URL = 'http://localhost:8080/api/v1'
 
+/**
+ * ProxyClient class to interact with the local web server.
+ */
 class ProxyClient {
+  /**
+   * Constructor for ProxyClient.
+   * @param {string} [serverUrl=API_BASE_URL] - The base URL of the server.
+   */
   constructor (serverUrl = API_BASE_URL) {
     this.serverUrl = serverUrl
   }
 
+  /**
+   * Constructs the full URL for an API endpoint.
+   * @param {string} path - The API endpoint path.
+   * @returns {string} - The full URL.
+   */
   constructUrl (path) {
     return `${this.serverUrl}${path}`
   }
 
+  /**
+   * Sends an API request to the server.
+   * @param {string} method - The HTTP method (e.g., GET, POST).
+   * @param {string} path - The API endpoint path.
+   * @param {Object|null} [body=null] - The request payload.
+   * @returns {Promise<Object>} - The parsed JSON response.
+   * @throws Will throw an error if the request fails.
+   */
   async apiRequest (method, path, body = null) {
     const url = this.constructUrl(path)
     const options = {
@@ -30,11 +54,21 @@ class ProxyClient {
 
       return data
     } catch (error) {
-      console.error(`[ProxyClient] API Request failed for ${url}: ${error.message}`)
+      console.error(
+        `[ProxyClient] API Request failed for ${url}: ${error.message}`,
+      )
       throw error
     }
   }
 
+  /**
+   * Handles API requests with optional success callbacks.
+   * @param {string} method - The HTTP method.
+   * @param {string} endpoint - The API endpoint.
+   * @param {Object|null} [body=null] - The request payload.
+   * @param {Function|null} [successCallback=null] - Callback for successful responses.
+   * @returns {Promise<Object|null>} - The API response or null if an error occurs.
+   */
   async handleRequest (method, endpoint, body = null, successCallback = null) {
     try {
       const data = await this.apiRequest(method, endpoint, body)
@@ -47,15 +81,26 @@ class ProxyClient {
       }
       throw new Error(data.message || 'Unexpected API response.')
     } catch (error) {
-      console.error(`[ProxyClient] Request to ${endpoint} failed: ${error.message}`)
+      console.error(
+        `[ProxyClient] Request to ${endpoint} failed: ${error.message}`,
+      )
       return null
     }
   }
 
+  /**
+   * Fetches the proxy configuration.
+   * @returns {Promise<Object|null>} - The proxy configuration or null on failure.
+   */
   async getConfig () {
     return this.handleRequest('GET', '/config', null, (data) => data.config)
   }
 
+  /**
+   * Sets the proxy configuration.
+   * @param {Object} config - The proxy configuration object.
+   * @returns {Promise<boolean>} - True if successful, otherwise false.
+   */
   async setConfig (config) {
     return this.handleRequest('POST', '/config', config, () => {
       console.log('Configuration saved successfully.')
@@ -63,6 +108,10 @@ class ProxyClient {
     })
   }
 
+  /**
+   * Starts the proxy server.
+   * @returns {Promise<boolean>} - True if successful, otherwise false.
+   */
   async startProxy () {
     return this.handleRequest('POST', '/up', null, () => {
       console.log('Proxy started successfully.')
@@ -70,6 +119,10 @@ class ProxyClient {
     })
   }
 
+  /**
+   * Stops the proxy server.
+   * @returns {Promise<boolean>} - True if successful, otherwise false.
+   */
   async stopProxy () {
     return this.handleRequest('POST', '/down', null, () => {
       console.log('Proxy stopped successfully.')
@@ -77,6 +130,10 @@ class ProxyClient {
     })
   }
 
+  /**
+   * Checks if the proxy server is running.
+   * @returns {Promise<boolean>} - True if running, otherwise false.
+   */
   async isRunning () {
     console.log('[PROXYCLIENT] Checking if proxy is running...')
     return this.handleRequest('GET', '/ping', null, (data) => {
@@ -85,6 +142,11 @@ class ProxyClient {
     })
   }
 
+  /**
+   * Validates a proxy configuration URI.
+   * @param {string} configUri - The configuration URI to validate.
+   * @returns {boolean} - True if the URI is valid, otherwise false.
+   */
   validateConfig = (configUri) => {
     const configRegex = /^(vmess|vless|ss):\/\//
 
