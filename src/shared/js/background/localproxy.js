@@ -2,29 +2,12 @@
  * API Base URL for the ProxyClient
  * @constant {string}
  */
-const API_BASE_URL = 'http://localhost:8080/api/v1'
+const API_URL = 'http://localhost:8080/api/v1'
 
 /**
  * ProxyClient class to interact with the local web server.
  */
 class ProxyClient {
-  /**
-   * Constructor for ProxyClient.
-   * @param {string} [serverUrl=API_BASE_URL] - The base URL of the server.
-   */
-  constructor (serverUrl = API_BASE_URL) {
-    this.serverUrl = serverUrl
-  }
-
-  /**
-   * Constructs the full URL for an API endpoint.
-   * @param {string} path - The API endpoint path.
-   * @returns {string} - The full URL.
-   */
-  constructUrl (path) {
-    return `${this.serverUrl}${path}`
-  }
-
   /**
    * Sends an API request to the server.
    * @param {string} method - The HTTP method (e.g., GET, POST).
@@ -34,10 +17,12 @@ class ProxyClient {
    * @throws Will throw an error if the request fails.
    */
   async apiRequest (method, path, body = null) {
-    const url = this.constructUrl(path)
+    const url = `${API_URL}${path}`
     const options = {
       method,
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+      },
     }
 
     if (body) {
@@ -156,6 +141,7 @@ class ProxyClient {
 
     const [protocol, path] = configUri.split('://')
 
+    // Vmess URIs are just base64 encoded JSON objects
     if (protocol === 'vmess') {
       try {
         window.atob(path)
