@@ -22,8 +22,9 @@ const getMessageKeys = (locale) => {
 
 const ruData = getMessageKeys('ru')
 const enData = getMessageKeys('en')
+const ukData = getMessageKeys('uk')
 
-for (const [a, b] of zip(ruData, enData)) {
+for (const [a, b] of zip(ruData, enData, ukData)) {
   if (a !== b) {
     throw new Error(`Keys mismatch found: ${a} !== ${b}`)
   }
