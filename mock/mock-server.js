@@ -14,8 +14,6 @@ let config = {
   config: 'vless://I6MTczNzM3ODIzMH0.TK9Fk6FSEr8IsxcXIskLtj2HkqXSJiST6gl4aOeBCZE',
 }
 
-// Routes
-
 // Get configuration
 app.get('/api/v1/config', (req, res) => {
   res.json({
@@ -37,8 +35,9 @@ app.post('/api/v1/config', (req, res) => {
 // Start proxy
 app.post('/api/v1/up', (req, res) => {
   res.json({
+    message: 'Xray process started successfully',
     status: 'success',
-    message: 'Proxy started successfully.',
+    xray_port: 10808,
   })
 })
 
