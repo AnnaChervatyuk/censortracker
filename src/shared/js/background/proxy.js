@@ -9,11 +9,21 @@ class ProxyManager {
       proxyServerURI,
       customProxyProtocol,
       customProxyServerURI,
+      localProxyURI,
     } = await browser.storage.local.get([
       'proxyServerURI',
       'customProxyProtocol',
       'customProxyServerURI',
+      'localProxyURI',
     ])
+
+    // When Censor Tracker Proxy Server is used
+    if (localProxyURI) {
+      return {
+        proxyServerProtocol: 'SOCKS5',
+        proxyServerURI: localProxyURI,
+      }
+    }
 
     if (
       customProxyServerURI &&
