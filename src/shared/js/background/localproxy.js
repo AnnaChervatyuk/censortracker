@@ -83,7 +83,7 @@ class ProxyClient {
 
   /**
    * Sets the proxy configuration.
-   * @param {Object} config - The proxy configuration object.
+   * @param {Array} config - The proxy configuration object.
    * @returns {Promise<boolean>} - True if successful, otherwise false.
    */
   async setConfig (config) {
@@ -95,12 +95,12 @@ class ProxyClient {
 
   /**
    * Starts the proxy server.
-   * @returns {Promise<boolean>} - True if successful, otherwise false.
+   * @returns {Promise<number>} - True if successful, otherwise false.
    */
   async startProxy () {
-    return this.handleRequest('POST', '/up', null, () => {
+    return this.handleRequest('POST', '/up', null, (data) => {
       console.log('Proxy started successfully.')
-      return true
+      return data.xray_port
     })
   }
 
@@ -120,7 +120,7 @@ class ProxyClient {
    * @returns {Promise<boolean>} - True if running, otherwise false.
    */
   async isRunning () {
-    console.log('[PROXYCLIENT] Checking if proxy is running...')
+    console.log('Checking if proxy is running...')
     return this.handleRequest('GET', '/ping', null, (data) => {
       console.log('Ping response received:', data)
       return true
