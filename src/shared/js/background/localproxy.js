@@ -87,9 +87,9 @@ class ProxyClient {
    * @returns {Promise<boolean>} - True if successful, otherwise false.
    */
   async setConfig (config) {
-    return this.handleRequest('POST', '/config', config, () => {
+    return this.handleRequest('POST', '/config', config, (data) => {
       console.log('Configuration saved successfully.')
-      return true
+      return data.status === 'success'
     })
   }
 
@@ -119,11 +119,10 @@ class ProxyClient {
    * Checks if the proxy server is running.
    * @returns {Promise<boolean>} - True if running, otherwise false.
    */
-  async isRunning () {
+  async ping () {
     console.log('Checking if proxy is running...')
     return this.handleRequest('GET', '/ping', null, (data) => {
-      console.log('Ping response received:', data)
-      return true
+      return data
     })
   }
 
