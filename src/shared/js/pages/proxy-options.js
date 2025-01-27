@@ -73,12 +73,10 @@ import ProxyManager from 'Background/proxy'
     if (LocalProxyClient.validateConfig(config)) {
       localProxyConfigTextarea.classList.remove('invalid-input')
       invalidLocalProxyConfig.classList.add('hidden')
-      const response = await LocalProxyClient.setConfig([config])
+      const configSet = await LocalProxyClient.setConfig([config])
 
-      if (response.status === 'success') {
+      if (configSet) {
         const xrayProxyPort = await LocalProxyClient.startProxy()
-
-        console.warn(`Proxy started successfully on port: ${xrayProxyPort}`)
 
         if (xrayProxyPort) {
           const localProxyURI = `127.0.0.1:${xrayProxyPort}`
@@ -88,10 +86,11 @@ import ProxyManager from 'Background/proxy'
             localProxyConfig: config,
             localProxyURI,
           })
-          console.log(`Local proxy set successfully: ${localProxyURI}`)
+          await ProxyManager.setProxy()
+          console.warn(`Proxy started successfully on port: ${xrayProxyPort}`)
         }
       } else {
-        console.error(`Failed to set local proxy configuration: ${JSON.stringify(response)}`)
+        console.error('Failed to set local proxy configuration.')
       }
     } else {
       localProxyConfigTextarea.classList.add('invalid-input')
@@ -127,6 +126,7 @@ import ProxyManager from 'Background/proxy'
       localProxyOptions.classList.add('hidden')
       proxyServerInput.value = ''
       await ProxyManager.removeCustomProxy()
+      await ProxyManager.removeLocalProxy()
       await ProxyManager.setProxy()
     } else if (value === 'custom') {
       localProxyOptions.classList.add('hidden')
@@ -134,8 +134,8 @@ import ProxyManager from 'Background/proxy'
     } else if (value === 'local') {
       proxyOptionsInputs.classList.add('hidden')
       localProxyOptions.classList.remove('hidden')
-      LocalProxyClient.isRunning().then((isRunning) => {
-        if (isRunning) {
+      LocalProxyClient.ping().then(async (data) => {
+        if (data.status === 'success') {
           localProxyForm.hidden = false
           localProxyClientNotFound.hidden = true
         } else {
