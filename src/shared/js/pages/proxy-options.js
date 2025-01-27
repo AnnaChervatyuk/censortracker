@@ -73,15 +73,25 @@ import ProxyManager from 'Background/proxy'
     if (LocalProxyClient.validateConfig(config)) {
       localProxyConfigTextarea.classList.remove('invalid-input')
       invalidLocalProxyConfig.classList.add('hidden')
-      const configSet = await LocalProxyClient.setConfig(config)
+      const response = await LocalProxyClient.setConfig([config])
 
-      if (configSet.status === 'success') {
-        await browser.storage.local.set({
-          useLocalProxy: true,
-          localProxyConfig: config,
-        })
+      if (response.status === 'success') {
+        const xrayProxyPort = await LocalProxyClient.startProxy()
+
+        console.warn(`Proxy started successfully on port: ${xrayProxyPort}`)
+
+        if (xrayProxyPort) {
+          const localProxyURI = `127.0.0.1:${xrayProxyPort}`
+
+          await browser.storage.local.set({
+            useLocalProxy: true,
+            localProxyConfig: config,
+            localProxyURI,
+          })
+          console.log(`Local proxy set successfully: ${localProxyURI}`)
+        }
       } else {
-        console.error('Failed to set local proxy configuration.')
+        console.error(`Failed to set local proxy configuration: ${JSON.stringify(response)}`)
       }
     } else {
       localProxyConfigTextarea.classList.add('invalid-input')
@@ -125,8 +135,13 @@ import ProxyManager from 'Background/proxy'
       proxyOptionsInputs.classList.add('hidden')
       localProxyOptions.classList.remove('hidden')
       LocalProxyClient.isRunning().then((isRunning) => {
-        localProxyForm.hidden = !isRunning
-        localProxyClientNotFound.hidden = isRunning
+        if (isRunning) {
+          localProxyForm.hidden = false
+          localProxyClientNotFound.hidden = true
+        } else {
+          localProxyForm.hidden = true
+          localProxyClientNotFound.hidden = false
+        }
       })
     }
   })
