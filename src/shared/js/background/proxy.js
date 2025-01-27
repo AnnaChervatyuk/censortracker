@@ -69,6 +69,7 @@ class ProxyManager {
     const domains = await registry.getDomains()
 
     if (domains.length === 0) {
+      console.error('No domains to proxy, aborting...')
       await this.removeProxy()
       return false
     }
@@ -208,6 +209,11 @@ class ProxyManager {
       'customProxyProtocol',
       'customProxyServerURI',
     ])
+  }
+
+  async removeLocalProxy () {
+    await browser.storage.local.set({ useLocalProxy: false })
+    await browser.storage.local.remove(['localProxyURI'])
   }
 
   async removeBadProxies () {
