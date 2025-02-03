@@ -1,32 +1,22 @@
-/**
- * API Base URL for the ProxyClient
- * @constant {string}
- */
 const API_URL = 'http://localhost:8080/api/v1'
 
 /**
- * ProxyClient class to interact with the local web server.
+ * ProxyClient handles API communication with the proxy server.
  */
 class ProxyClient {
   /**
-   * Sends an API request to the server.
-   * @param {string} method - The HTTP method (e.g., GET, POST).
-   * @param {string} path - The API endpoint path.
-   * @param {Object|null} [body=null] - The request payload.
-   * @returns {Promise<Object>} - The parsed JSON response.
-   * @throws Will throw an error if the request fails.
+   * Sends an HTTP request to the API.
+   * @param {string} method - HTTP method (GET, POST, etc.).
+   * @param {string} endpoint - API endpoint path.
+   * @param {Object|null} [body=null] - Request payload.
+   * @returns {Promise<Object>} - Parsed JSON response.
    */
-  async apiRequest (method, path, body = null) {
-    const url = `${API_URL}${path}`
+  async request (method, endpoint, body = null) {
+    const url = `${API_URL}${endpoint}`
     const options = {
       method,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }
-
-    if (body) {
-      options.body = JSON.stringify(body)
+      headers: { 'Content-Type': 'application/json' },
+      ...(body && { body: JSON.stringify(body) }),
     }
 
     try {
@@ -36,83 +26,135 @@ class ProxyClient {
       if (!response.ok) {
         throw new Error(data.message || `HTTP error: ${response.status}`)
       }
-
       return data
     } catch (error) {
       console.error(
-        `[ProxyClient] API Request failed for ${url}: ${error.message}`,
+        `[ProxyClient] Request failed: ${method} ${url} - ${error.message}`,
       )
       throw error
     }
   }
 
   /**
-   * Handles API requests with optional success callbacks.
-   * @param {string} method - The HTTP method.
-   * @param {string} endpoint - The API endpoint.
-   * @param {Object|null} [body=null] - The request payload.
-   * @param {Function|null} [successCallback=null] - Callback for successful responses.
-   * @returns {Promise<Object|null>} - The API response or null if an error occurs.
+   * Handles API request with optional success callback.
+   * @param {string} method - HTTP method.
+   * @param {string} endpoint - API endpoint.
+   * @param {Object|null} [body=null] - Request payload.
+   * @param {Function|null} [successCallback=null] - Callback executed on success.
+   * @returns {Promise<Object|null>} - API response or null on failure.
    */
   async handleRequest (method, endpoint, body = null, successCallback = null) {
     try {
-      const data = await this.apiRequest(method, endpoint, body)
+      const data = await this.request(method, endpoint, body)
 
-      if (data.status === 'success') {
-        if (successCallback) {
-          return successCallback(data)
-        }
-        return data
-      }
-      throw new Error(data.message || 'Unexpected API response.')
-    } catch (error) {
-      console.error(
-        `[ProxyClient] Request to ${endpoint} failed: ${error.message}`,
-      )
+      return successCallback ? successCallback(data) : data
+    } catch {
       return null
     }
   }
 
   /**
-   * Fetches the proxy configuration.
-   * @returns {Promise<Object|null>} - The proxy configuration or null on failure.
+   * Retrieves proxy configuration(s).
+   * @param {string} [uuids=''] - Comma-separated UUIDs of configurations.
+   * @returns {Promise<Object[]>} - List of configurations.
    */
-  async getConfig () {
-    return this.handleRequest('GET', '/config', null, (data) => data.config)
+  async getConfig (uuids = '') {
+    return this.handleRequest(
+      'GET',
+      `/config?uuid=${encodeURIComponent(uuids)}`,
+      null,
+      (data) => data.config || [],
+    )
   }
 
   /**
-   * Sets the proxy configuration.
-   * @param {Array} config - The proxy configuration object.
+   * Adds a new proxy configuration.
+   * @param {Object[]} configs - Array of configuration objects.
    * @returns {Promise<boolean>} - True if successful, otherwise false.
    */
-  async setConfig (config) {
-    return this.handleRequest('POST', '/config', config, (data) => {
-      console.log('Configuration saved successfully.')
-      return data.status === 'success'
-    })
+  async setConfig (configs) {
+    return this.handleRequest(
+      'POST',
+      '/config',
+      configs,
+      (data) => data.status === 'success',
+    )
+  }
+
+  /**
+   * Updates existing proxy configurations.
+   * @param {Object[]} configs - Array of updated configurations.
+   * @returns {Promise<boolean>} - True if successful, otherwise false.
+   */
+  async updateConfig (configs) {
+    return this.handleRequest(
+      'PUT',
+      '/config',
+      configs,
+      (data) => data.status === 'success',
+    )
+  }
+
+  /**
+   * Deletes a proxy configuration by UUID.
+   * @param {string} uuid - UUID of the configuration to delete.
+   * @returns {Promise<boolean>} - True if successful, otherwise false.
+   */
+  async deleteConfig (uuid) {
+    return this.handleRequest(
+      'DELETE',
+      `/config/${encodeURIComponent(uuid)}`,
+      null,
+      (data) => data.status === 'success',
+    )
+  }
+
+  /**
+   * Activates a proxy configuration by UUID.
+   * @param {string} uuid - UUID of the configuration to activate.
+   * @returns {Promise<boolean>} - True if successful, otherwise false.
+   */
+  async activateConfig (uuid) {
+    return this.handleRequest(
+      'PUT',
+      `/config/activate/${encodeURIComponent(uuid)}`,
+      null,
+      (data) => data.status === 'success',
+    )
+  }
+
+  /**
+   * Retrieves the active proxy configuration.
+   * @returns {Promise<Object|null>} - Active configuration or null if not found.
+   */
+  async getActiveConfig () {
+    return this.handleRequest(
+      'GET',
+      '/config/active',
+      null,
+      (data) => data.config || null,
+    )
   }
 
   /**
    * Starts the proxy server.
-   * @returns {Promise<number>} - True if successful, otherwise false.
+   * @returns {Promise<number|null>} - Proxy server port if successful, otherwise null.
    */
   async startProxy () {
-    return this.handleRequest('POST', '/up', null, (data) => {
-      console.log('Proxy started successfully.')
-      return data.xray_port
-    })
+    return this.handleRequest(
+      'POST',
+      '/up',
+      null,
+      (data) => data.xray_port || null,
+    )
   }
 
   /**
    * Stops the proxy server.
-   * @returns {Promise<boolean>} - True if successful, otherwise false.
+   * @returns {Promise<boolean>} - True if successful.
    */
   async stopProxy () {
-    return this.handleRequest('POST', '/down', null, () => {
-      console.log('Proxy stopped successfully.')
-      return true
-    })
+    return this.handleRequest('POST', '/down', null, () => true)
   }
 
   /**
@@ -120,32 +162,23 @@ class ProxyClient {
    * @returns {Promise<boolean>} - True if running, otherwise false.
    */
   async ping () {
-    console.log('Checking if proxy is running...')
-    return this.handleRequest('GET', '/ping', null, (data) => {
-      return data
-    })
+    return this.handleRequest('GET', '/ping', null, (data) => Boolean(data))
   }
 
   /**
    * Validates a proxy configuration URI.
-   * @param {string} configUri - The configuration URI to validate.
-   * @returns {boolean} - True if the URI is valid, otherwise false.
+   * @param {string} configUri - Proxy configuration URI.
+   * @returns {boolean} - True if valid, otherwise false.
    */
-  validateConfig = (configUri) => {
-    const configRegex = /^(vmess|vless|ss):\/\//
-
-    if (!configRegex.test(configUri)) {
+  validateConfig (configUri) {
+    if (!/^(vmess|vless|ss):\/\//.test(configUri)) {
       return false
     }
-
-    const [protocol, path] = configUri.split('://')
-
-    // Vmess URIs are just base64 encoded JSON objects
-    if (protocol === 'vmess') {
+    if (configUri.startsWith('vmess://')) {
       try {
-        window.atob(path)
+        window.atob(configUri.split('://')[1])
         return true
-      } catch (error) {
+      } catch {
         return false
       }
     }
