@@ -5,7 +5,7 @@
   <meta charset="UTF-8"/>
   <title data-i18n-key="optionsProxyPageTitle"></title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <link rel="stylesheet" href="css/options.css"/>
+  <link rel="stylesheet" href="./../css/options.css" />
 </head>
 
 <body>
@@ -16,7 +16,7 @@
         <img src="../images/settings/quokka.png" width="200" height="auto" alt="Censor Tracker Logo"/>
       </a>
     </div>
-    <div class="main-page__info">
+    <div class="main-page__info main-page__info-proxy_options">
       <div class="main-page__return">
         <a class="return-link" href="options.html">
           <svg width="24" height="16" viewBox="0 0 24 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -41,7 +41,7 @@
           <div class="use_proxy__text" data-i18n-key="optionsProxyDesc"></div>
         </div>
 
-        <div id="proxyCustomOptions" hidden>
+        <div id="proxyCustomOptions">
           <div id="proxyCustomOptionsRadioGroup" class="radio-buttons-group">
             <div class="radio-button">
               <input id="useDefaultProxy" class="radio-button-input" type="radio" name="proxy-radio" value="default"
@@ -50,7 +50,7 @@
             </div>
             <div class="radio-button">
               <input class="radio-button-input" type="radio" name="proxy-radio" id="useCustomProxy" value="custom">
-              <label class="radio-button-label" for="useCustomProxy" data-i18n-key="useOwnProxy"></label>
+              <label class="radio-button-label" for="useCustomProxy" data-i18n-key="useOwnProxy">Свой прокси</label>
             </div>
             <div id="proxyOptionsInputs" class="proxy-options-inputs hidden">
               <div class="select" id="selectProxyProtocol">
@@ -79,29 +79,187 @@
 
             <div class="radio-button">
               <input class="radio-button-input" type="radio" name="proxy-radio" id="useLocalProxy" value="local">
-              <label class="radio-button-label" for="useLocalProxy" data-i18n-key="useLocalProxy"></label>
+              <label class="radio-button-label" for="useLocalProxy" data-i18n-key="useLocalProxy">Использовать локальный прокси</label>
+              <button class="btn btn-dark btn__addLocalProxy" id="saveLocalProxyButton" onclick="openPopup('proxy-list__block__popup-add-proxy')">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <path d="M4.16406 10.0001H15.8307M9.9974 4.16675V15.8334" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+                <span class="btn__text" data-i18n-key="addLocalProxyButton">Добавить</span>
+              </button>
             </div>
 
-            <div id="localProxyOptions" class="hidden">
-              <div id="localProxyClientNotFound" class="local-proxy-disclaimer">
-                <div class="disclaimer__text" data-i18n-key="localProxyNotFound"></div>
-                <button class="btn btn-light" id="downloadProxyAppButton" data-i18n-key="downloadAppButton"></button>
-              </div>
-
-              <div id="localProxyForm">
-                <div id="localProxyConfigBlock">
-                  <label for="localProxyConfig" data-i18n-key="localProxyConfigValueTitle"></label>
-                  <div id="localProxyConfigValueDescr" data-i18n-key="localProxyConfigValueDescr"></div>
-                  <textarea id="localProxyConfig" rows="3" class="input-proxy"></textarea>
+            <div class="block_custom-local-proxy">
+              <div class="censortracker-not-found__wrapper">
+                <div>
+                  <b>Приложение CensorTracker Proxy не&nbsp;найдено на&nbsp;устройстве</b>
                 </div>
-
-                <div id="invalidLocalProxyConfig" class="hidden" data-i18n-key="invalidLocalProxyConfig"></div>
-
-                <button class="btn btn-dark" id="applyLocalProxyButton">
-                  <span class="btn__text" data-i18n-key="applyLocalProxyButton"></span>
+                <div>Скачайте и&nbsp;запустите приложение CensorTracker Proxy. Оно будет работать в&nbsp;фоне и&nbsp;поддерживать работу локального прокси</div>
+                <button class="btn btn__censortracker-not-found">
+                  <span class="btn__text">Скачать</span>
                 </button>
               </div>
-            </div>
+              <div class="add-proxy__wrapper">
+                <div class="add-proxy__inner">
+                  <div><b>Добавьте прокси для подключения</b></div>
+                  <div>Рекомендуем RKS VPN в качестве локального прокси</div>
+                </div>
+                <div class="rks-vpn__wrapper">
+                  <img class="rks-vpn__logo" src="../images/settings/rks_logo.svg" width="166" height="auto" alt="RKS VPN logo"/>
+                  <div class="rks-vpn__title">Устойчивый к&nbsp;блокировкам VPN</div>
+                  <div class="rks-vpn__text">Работает как в&nbsp;CensorTracker, так и&nbsp;в&nbsp;других приложениях, в&nbsp;том&nbsp;числе на&nbsp;телефоне и&nbsp;ТВ</div>
+                  <a class="btn btn-dark btn__rks-vpn" href="https://vpnpay.io/ru/rks/" target="_blank">
+                    <span class="btn__text">Подробнее об RKS VPN</span>
+                  </a>
+                </div>
+              </div>
+
+              <div class="proxy-list__wrapper">
+
+                <div class="proxy-list__block">
+                  
+                  <div class="proxy-list__block-title">RKS VPN
+                    <div class="proxy-list__block-item__btn"  onclick="toggleMenu(event, this)">
+                      <img src="./../images/settings/more_icon.svg" />
+                    </div>
+                  </div>
+                    
+
+                  <div class="proxy-list__block-items proxy-list__block-items_rks">
+                    <div class="radio-button proxy-list__block-item">
+                      <input class="radio-button-input" type="radio" name="local-proxy" id="Shadowsocks1" value="Shadowsocks1"/>
+                      <label class="radio-button-label" for="Shadowsocks1">[PL] Shadowsocks - TCP</label>
+                      <div class="proxy-list__block-item__btn"  onclick="toggleMenu(event, this)">
+                        <img src="./../images/settings/more_icon.svg" />
+                      </div>
+                    </div>
+                    <div class="radio-button proxy-list__block-item">
+                      <input class="radio-button-input" type="radio" name="local-proxy" id="Shadowsocks2" value="Shadowsocks2"/>
+                      <label class="radio-button-label" for="Shadowsocks2">[PL] Shadowsocks - TCP</label>
+                      <div class="proxy-list__block-item__btn"  onclick="toggleMenu(event, this)">
+                        <img src="./../images/settings/more_icon.svg" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="proxy-list__block">
+                  <div class="proxy-list__block-title">Amnezia Premium
+                    <div class="proxy-list__block-item__btn"  onclick="toggleMenu(event, this)">
+                      <img src="./../images/settings/more_icon.svg" />
+                    </div>
+                  </div>
+                  <div class="proxy-list__block-items">
+                    <div class="radio-button proxy-list__block-item">
+                      <input class="radio-button-input" type="radio" name="local-proxy" id="Shadowsocks3" value="Shadowsocks3"/>
+                      <label class="radio-button-label" for="Shadowsocks3">[PL] Shadowsocks - TCP</label>
+                      <div class="proxy-list__block-item__btn"  onclick="toggleMenu(event, this)">
+                        <img src="./../images/settings/more_icon.svg" />
+                      </div>
+                    </div>
+                    <div class="radio-button proxy-list__block-item">
+                      <input class="radio-button-input" type="radio" name="local-proxy" id="Shadowsocks4" value="Shadowsocks4"/>
+                      <label class="radio-button-label" for="Shadowsocks4">[PL] Shadowsocks - TCP</label>
+                      <div class="proxy-list__block-item__btn"  onclick="toggleMenu(event, this)">
+                        <img src="./../images/settings/more_icon.svg" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="proxy-list__block">
+                    <div class="radio-button proxy-list__block-item">
+                      <input class="radio-button-input" type="radio" name="local-proxy" id="Shadowsocks5" value="Shadowsocks5"/>
+                      <label class="radio-button-label" for="Shadowsocks5">[PL] Shadowsocks - TCP</label>
+                      <div class="proxy-list__block-item__btn"  onclick="toggleMenu(event, this)">
+                        <img src="./../images/settings/more_icon.svg" />
+                      </div>
+                    </div>
+                </div>
+
+                <div class="proxy-list__block">
+                  <div class="radio-button proxy-list__block-item">
+                    <input class="radio-button-input" type="radio" name="local-proxy" id="Shadowsocks6" value="Shadowsocks6"/>
+                    <label class="radio-button-label" for="Shadowsocks6">[PL] Shadowsocks - TCP</label>
+                    <div class="proxy-list__block-item__btn"  onclick="toggleMenu(event, this)">
+                      <img src="./../images/settings/more_icon.svg" />
+                    </div>
+                  </div>
+                </div>
+
+                <div class="proxy-list__block">
+                  <div class="radio-button proxy-list__block-item">
+                    <input class="radio-button-input" type="radio" name="local-proxy" id="Shadowsocks7" value="Shadowsocks7"/>
+                    <label class="radio-button-label" for="Shadowsocks7">[PL] Shadowsocks - TCP</label>
+                    <div class="proxy-list__block-item__btn"  onclick="toggleMenu(event, this)">
+                      <img src="./../images/settings/more_icon.svg" />
+                    </div>
+                  </div>
+                </div>
+
+                <div class="proxy-list__block">
+                  <div class="radio-button proxy-list__block-item">
+                    <input class="radio-button-input" type="radio" name="local-proxy" id="Shadowsocks8" value="Shadowsocks8"/>
+                    <label class="radio-button-label" for="Shadowsocks8">[PL] Shadowsocks - TCP</label>
+                    <div class="proxy-list__block-item__btn"  onclick="toggleMenu(event, this)">
+                      <img src="./../images/settings/more_icon.svg" />
+                    </div>
+                  </div>
+                </div>
+
+                <div class="proxy-list__block-item__menu" id="proxy-list__block-item__menu">
+                  <ul>
+                    <li onclick="openPopup('proxy-list__block__popup-add-proxy')">Обновить</li>
+                    <li onclick="openPopup('proxy-list__block__popup-rename-proxy')">Переименовать</li>
+                    <li onclick="openPopup('proxy-list__block__popup-delete-proxy')">Удалить</li>
+                  </ul>
+                </div>
+
+
+                <div class="proxy-list__block__popup proxy-list__block__popup-add-proxy" id="proxy-list__block__popup-add-proxy">
+                  <div class="popup-add-proxy__btn-close" onclick="closePopup(event)"><img src="../images/settings/close_icon.svg" width="44" height="44" alt=""/></div>
+                  <div class="popup-add-proxy__inner">
+                    <div class="popup-add-proxy__title">Добавление прокси</div>
+                    <div>Код подключения</div>
+                    <textarea></textarea>
+                    <div class="popup-add-proxy__text">Рекомендуем <img src="../images/settings/rks_logo.svg" width="86" height="auto" alt="RKS VPN logo"/> в&nbsp;качестве локального прокси. <a href="https://vpnpay.io/ru/rks/" target="_blank">Подробнее</a></div>
+                    <div class="popup-add-proxy__btns">
+                      <button class="btn btn-dark"><span class="btn__text">Добавить</span></button>
+                      <button class="btn" onclick="closePopup(event)"><span class="btn__text">Отмена</span></button>
+                    </div>
+                  </div>
+                </div>
+
+
+                <div class="proxy-list__block__popup proxy-list__block__popup-delete-proxy" id="proxy-list__block__popup-delete-proxy">
+                  <div class="popup-add-proxy__btn-close" onclick="closePopup(event)"><img src="../images/settings/close_icon.svg" width="44" height="44" alt=""/></div>
+                  <div class="popup-add-proxy__inner">
+                    <div class="popup-add-proxy__title">Удалить прокси [PL] Shadowsocks - TCP?</div>
+                    <div class="popup-add-proxy__btns">
+                      <button class="btn btn-dark"><span class="btn__text">Да, удалить</span></button>
+                      <button class="btn" onclick="closePopup(event)"><span class="btn__text" >Не удалять</span></button>
+                    </div>
+                  </div>
+                </div>
+
+
+                <div class="proxy-list__block__popup proxy-list__block__popup-rename-proxy" id="proxy-list__block__popup-rename-proxy">
+                  <div class="popup-add-proxy__btn-close" onclick="closePopup(event)"><img src="../images/settings/close_icon.svg" width="44" height="44" alt=""/></div>
+                  <div class="popup-add-proxy__inner">
+                    <div class="popup-add-proxy__title">Переименование [PL] Shadowsocks - TCP</div>
+                    <input type="text" class="input-proxy popup-add-proxy__input" />
+                    <div class="popup-add-proxy__input-error">Пример ошибки. Название не может быть пустым</div>
+                    <div class="popup-add-proxy__btns">
+                      <button class="btn btn-dark"><span class="btn__text">Сохранить</span></button>
+                      <button class="btn" onclick="closePopup(event)"><span class="btn__text">Отмена</span></button>
+                    </div>
+                  </div>
+                </div>
+
+                </div>
+
+              </div>
+
+
           </div>
         </div>
 
@@ -128,5 +286,145 @@
     </div>
   </div>
 </div>
+
+<script>
+
+// показывать/скрывать блок для своего локального прокси - начало
+  const radioButtons = document.querySelectorAll('input[name="proxy-radio"]');
+  const blockLocalProxy = document.querySelector(".block_custom-local-proxy");
+  const btnaddLocalProxy = document.querySelector(".btn__addLocalProxy");
+
+  function toggleElements(event) {
+    const isChecked = event.target.checked && event.target.id === "useLocalProxy";
+    if (isChecked) {
+      blockLocalProxy.style.display = "block";
+      btnaddLocalProxy.style.display = "inline-flex";
+    } else {
+      blockLocalProxy.style.display = "none";
+      btnaddLocalProxy.style.display = "none";
+    }
+  }
+
+  radioButtons.forEach(radio => {
+    radio.addEventListener("change", toggleElements);
+  });
+
+  toggleElements({ target: document.getElementById("useLocalProxy") });
+// показывать/скрывать блок для своего локального прокси  - начало
+
+
+// аккордион для блоков с группой proxy - начало
+  document.querySelectorAll(".proxy-list__block-title").forEach((header) => {
+    header.addEventListener("click", function () {
+      const content = this.nextElementSibling;
+
+      document.querySelectorAll(".proxy-list__block-items").forEach((item) => {
+        if (item !== content) {
+          item.style.maxHeight = null;
+          item.previousElementSibling.classList.remove("active");
+        }
+      });
+
+      if (content.style.maxHeight) {
+        content.style.maxHeight = null;
+        this.classList.remove("active");
+      } else {
+        content.style.maxHeight = content.scrollHeight + "px";
+        this.classList.add("active");
+      }
+    });
+  });
+// аккордион для блоков с группой proxy  - конец
+
+
+// подсказки к выбранным proxy  - начало
+  document.addEventListener("DOMContentLoaded", function () {
+    const radioButtons = document.querySelectorAll(".radio-button-input");
+
+    function updateSelection() {
+      document.querySelectorAll(".proxy-list__block-title span").forEach(span => span.remove());
+      document.querySelectorAll(".radio-button-label span").forEach(span => span.remove());
+      radioButtons.forEach(radio => {
+        if (radio.name === "local-proxy" && radio.checked) {
+          const label = document.querySelector(`label[for="${radio.id}"]`);
+          if (label) {
+            let statusSpan = document.createElement("span");
+            statusSpan.textContent = "Подключено";
+            label.appendChild(statusSpan);
+          }
+
+          let block = radio.closest(".proxy-list__block");
+          if (block) {
+            let title = block.querySelector(".proxy-list__block-title");
+            if (title) {
+              let chosenSpan = document.createElement("span");
+              chosenSpan.textContent = "Выбран";
+              title.appendChild(chosenSpan);
+            }
+          }
+        }
+      });
+    }
+    radioButtons.forEach(radio => {
+        radio.addEventListener("change", updateSelection);
+    });
+
+    updateSelection();
+  });
+// подсказки к выбранным proxy  - конец
+
+
+
+// меню кнопок - начало
+  function toggleMenu(event, button) {
+    event.stopPropagation();
+    let menu = document.getElementById('proxy-list__block-item__menu');
+    let isActive = menu.classList.contains('active');
+    document.querySelectorAll('.proxy-list__block-item__btn').forEach(b => b.classList.remove('active'));
+    
+    if (!isActive) {
+      let rect = button.getBoundingClientRect();
+      menu.style.top = `${window.scrollY + rect.bottom}px`;
+      menu.classList.add('active');
+      menu.style.left = `${window.scrollX + rect.right - menu.offsetWidth}px`;
+      button.classList.add('active');
+    } else {
+      menu.classList.remove('active');
+    }
+  }
+
+  document.addEventListener('click', () => {
+    document.getElementById('proxy-list__block-item__menu').classList.remove('active');
+    document.querySelectorAll('.proxy-list__block-item__btn').forEach(b => b.classList.remove('active'));
+  });
+// меню кнопок - конец
+
+
+// открыть попапы - начало
+  function openPopup(popupId) {
+    const popup = document.getElementById(popupId);
+    if (popup) {
+        popup.style.display = "block";
+    }
+  }
+// закрыть попапы - начало
+
+
+
+// закрывать попап - начало
+  function closePopup(event) {
+    const popup = event.target.closest('.proxy-list__block__popup');
+    if (popup) {
+        popup.querySelectorAll("input, textarea").forEach(field => {
+            field.value = "";
+        });
+        popup.style.display = 'none';
+    }
+  }
+// закрывать попап - конец
+
+</script>
+
+
 </body>
 </html>

@@ -106,6 +106,11 @@ a {
     width: 620px;
 }
 
+.main-page__info.main-page__info-proxy_options {
+    max-width: 640px;
+    width: 640px;
+}
+
 .main-container__after-install .main-page__info {
     margin-right: 44px;
 }
@@ -405,6 +410,7 @@ a {
 .radio-button {
     margin: 15px 0;
     display: inline-block;
+    position: relative;
 }
 
 .radio-button input[type=radio] {
@@ -445,6 +451,10 @@ a {
     font-size: 16px;
     line-height: 15px;
     font-weight: normal;
+}
+
+.main-page__info-proxy_options .radio-button label {
+    padding-left: 35px;
 }
 
 .proxy-options-inputs {
@@ -634,7 +644,7 @@ a {
 }
 
 .btn-hidden {
-    display: none;
+    display: none !important;
 }
 
 .btn.btn-disabled:hover {
@@ -657,6 +667,329 @@ a {
     border-color: #3b332b;
 }
 
+
+.btn__addLocalProxy > svg {
+    margin-right: 5px;
+    fill: white; /* для SVG */
+    stroke: none;
+  }
+
+.btn.btn__addLocalProxy {
+    display: none;
+    align-items: center;
+    padding: 5px 10px;
+    font-size: 14px;
+    position: absolute;
+    right: 0;
+    margin-right: 0;
+}
+  
+.block_custom-local-proxy {
+    display: none;
+}
+  
+.block_custom-local-proxy .censortracker-not-found__wrapper {
+    background-color: #f7eded;
+    padding: 20px 30px;
+    border-radius: 4px;
+    margin-left: 35px;
+    margin-bottom: 30px;
+    margin-top: 15px;
+    font-size: 14px;
+    font-weight: 400;
+}
+  
+  
+.block_custom-local-proxy .btn__censortracker-not-found {
+    margin-top: 15px;
+    border: 1px solid #3b332b;
+}
+  
+.block_custom-local-proxy .add-proxy__wrapper {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 4px;
+    margin-left: 35px;
+    margin-bottom: 30px;
+    margin-top: 15px;
+    font-size: 14px;
+    font-weight: 400;
+    box-shadow: 0 1px 4px 0 rgba(15, 13, 11, 0.08), 0 1px 7px 0 rgba(15, 13, 11, 0.07), 0 2px 12px 0 rgba(15, 13, 11, 0.05);
+}
+  
+.block_custom-local-proxy .add-proxy__wrapper .add-proxy__inner {
+    padding: 20px 0;
+}
+
+.block_custom-local-proxy .add-proxy__wrapper .add-proxy__inner div{
+    text-align: center;
+    opacity: 0.5;
+}
+
+.block_custom-local-proxy .add-proxy__wrapper .add-proxy__inner div:first-child {
+    opacity: 1;
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+  
+.block_custom-local-proxy .add-proxy__wrapper .rks-vpn__wrapper {
+    background-color: #f8f8f8;
+    border: 1px solid #f1f1f1;
+    border-radius: 10px;
+    padding: 30px;
+    background-image: url('../images/settings/block_rks_bg.svg');
+    background-repeat: no-repeat;
+    background-position: right center;
+}
+  
+.rks-vpn__wrapper .rks-vpn__logo {
+    margin-bottom: 25px;
+  }
+  
+  .rks-vpn__wrapper .rks-vpn__title {
+    font-weight: 700;
+    font-size: 40px;
+    line-height: 95%;
+    margin-bottom: 10px;
+    max-width: 395px;
+  }
+  
+  .rks-vpn__wrapper .rks-vpn__text {
+    max-width: 395px;
+  }
+  
+  .rks-vpn__wrapper .btn__rks-vpn {
+    font-size: 14px;
+    margin-top: 25px;
+  }
+  
+  .block_custom-local-proxy .proxy-list__wrapper {
+    margin-left: 35px;
+    gap: 10px;
+    display: flex;
+    flex-direction: column;
+    font-size: 16px;
+    font-weight: 500;
+  }
+  
+  .block_custom-local-proxy .proxy-list__wrapper .proxy-list__block{
+    box-shadow: 0 1px 4px 0 rgba(15, 13, 11, 0.08), 0 1px 7px 0 rgba(15, 13, 11, 0.07), 0 2px 12px 0 rgba(15, 13, 11, 0.05);
+    border-radius: 10px;
+    padding: 15px 20px;
+  }
+  
+  
+  .block_custom-local-proxy .proxy-list__wrapper .proxy-list__block .proxy-list__block-title {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    width: 100%;
+    gap: 10px;
+    line-height: 125%;
+    margin-left: 5px;
+  }
+  
+  .block_custom-local-proxy .proxy-list__wrapper .proxy-list__block .proxy-list__block-title.active {
+    margin-bottom: 15px;
+  }
+  
+  .block_custom-local-proxy .proxy-list__wrapper .proxy-list__block .proxy-list__block-title::before {
+    content: "";
+    display: inline-block;
+    width: 9px;
+    height: 9px;
+    border-right: 1px solid black;
+    border-bottom: 1px solid black;
+    transform: rotate(45deg);
+    transition: transform 0.3s ease;
+    margin-top: -5px;
+  }
+  
+  .block_custom-local-proxy .proxy-list__wrapper .proxy-list__block .proxy-list__block-title.active::before {
+    transform: rotate(-135deg);
+    margin-top: 9px;
+  }
+  
+  
+  .block_custom-local-proxy .proxy-list__wrapper .proxy-list__block .proxy-list__block-items {
+    display: flex;
+    flex-direction: column;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, padding 0.3s ease;
+  }
+  
+  .block_custom-local-proxy .proxy-list__wrapper .proxy-list__block .proxy-list__block-items .proxy-list__block-item {
+    margin: 15px 0;
+  }
+  
+  .block_custom-local-proxy .proxy-list__wrapper .proxy-list__block > .proxy-list__block-item {
+    margin: 0;
+  }
+  
+  .block_custom-local-proxy .proxy-list__wrapper .proxy-list__block .proxy-list__block-item {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+  
+  .block_custom-local-proxy .proxy-list__wrapper .proxy-list__block .proxy-list__block-item .radio-button-label {
+    display: flex;
+    flex-grow: 1;
+  }
+  
+  .block_custom-local-proxy .proxy-list__wrapper .proxy-list__block .proxy-list__block-item__btn {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+    border-radius: 5px;
+    opacity: 0;
+    transition: opacity 0.2s;
+    cursor: pointer;
+    position: relative;
+    order: 2;
+    flex-grow: 0;
+  }
+  
+  .block_custom-local-proxy .proxy-list__wrapper .proxy-list__block .proxy-list__block-item:hover .proxy-list__block-item__btn,
+  .block_custom-local-proxy .proxy-list__wrapper .proxy-list__block .proxy-list__block-title:hover .proxy-list__block-item__btn {
+    opacity: 1;
+  }
+  
+  .block_custom-local-proxy .proxy-list__wrapper .proxy-list__block .proxy-list__block-item__btn:hover,
+  .block_custom-local-proxy .proxy-list__wrapper .proxy-list__block .proxy-list__block-item__btn.active {
+    background-color: rgba(237, 242, 247, 0.6);
+    opacity: 1;
+  }
+  
+  .block_custom-local-proxy .proxy-list__wrapper .proxy-list__block .proxy-list__block-item .radio-button-label span,
+  .block_custom-local-proxy .proxy-list__wrapper .proxy-list__block .proxy-list__block-title span {
+    margin-left: auto;
+    font-weight: 400;
+    font-size: 14px;
+    color: #6d675f;
+    flex-grow: 1;
+    text-align: right;
+  }
+  
+  
+  .proxy-list__wrapper .proxy-list__block-item__menu {
+    position: absolute;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    display: none;
+    z-index: 10;
+    box-shadow: 0 0px 2px 0 rgba(0, 0, 0, 0.02), 0 1px 5px 0 rgba(0, 0, 0, 0.03), 0 2px 10px 0 rgba(0, 0, 0, 0.04), 0 3px 18px 0 rgba(0, 0, 0, 0.04), 0 6px 33px 0 rgba(0, 0, 0, 0.05), 0 14px 40px 0 rgba(0, 0, 0, 0.03);
+    background: rgba(255, 255, 255, 0.98);
+    padding: 15px;
+  }
+  .proxy-list__wrapper .proxy-list__block-item__menu.active {
+    display: block;
+  }
+  
+  .proxy-list__wrapper .proxy-list__block-item__menu ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    gap: 10px;
+  }
+  
+  .proxy-list__wrapper .proxy-list__block-item__menu li {
+    margin: 0;
+    padding: 5px;
+    font-weight: 400;
+    font-size: 13px;
+    color: #5173d3;
+  }
+  
+  .proxy-list__wrapper .proxy-list__block-item__menu li:hover {
+    cursor: pointer;
+    text-decoration: underline;
+  }
+  
+  .proxy-list__block__popup {
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    overflow-y: auto;
+    background: rgba(255, 255, 255, 0.97);
+    z-index: 15;
+    top: 0;
+    left: 0;
+    display: none;
+  }
+  
+  .proxy-list__block__popup .popup-add-proxy__inner {
+    display: flex;
+    flex-direction: column;
+    margin: 50px auto;
+    padding: 40px;
+    max-width: 720px;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 140%;
+  }
+  
+  .proxy-list__block__popup .popup-add-proxy__title {
+    font-weight: 700;
+    font-size: 28px;
+    line-height: 107%;
+    margin-bottom: 40px;
+  }
+  
+  .proxy-list__block__popup textarea {
+    margin: 10px 0;
+    border: 1px solid #c4c2bf;
+    border-radius: 4px;
+    padding: 5px 15px;
+    width: 640px;
+    height: 150px;
+  }
+  
+  .proxy-list__block__popup .popup-add-proxy__text {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+  }
+  
+  .proxy-list__block__popup .popup-add-proxy__text a {
+    color: #5173d3;
+  }
+  
+  .proxy-list__block__popup .btn {
+    border: 1px solid #3b332b;
+    margin-top: 40px;
+    gap: 20px;
+  }
+  
+  .proxy-list__block__popup .popup-add-proxy__btn-close {
+    margin-top: 25px;
+    margin-right: 25px;
+    margin-left: auto;
+    width: fit-content;
+  }
+  
+  .proxy-list__block__popup .popup-add-proxy__btn-close:hover {
+    cursor: pointer;
+    opacity: 0.8;
+  }
+  
+  .proxy-list__block__popup .popup-add-proxy__input {
+    max-width: 400px;
+  }
+  
+  .proxy-list__block__popup .popup-add-proxy__input-error {
+    max-width: 400px;
+    margin-top: 10px;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 140%;
+    color: #b61414;
+  }
+
+  
 .mt-filler {
     margin-top: 20px;
 }
